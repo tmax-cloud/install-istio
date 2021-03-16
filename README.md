@@ -56,13 +56,13 @@
     ```
     * install yaml을 다운로드한다.
     ```bash
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/1.istio-base.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/2.kiali.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/3.istio-tracing.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/4.istio-core.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/5.istio-ingressgateway.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/6.istio-metric.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Istio/yaml/bookinfo.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/1.istio-base.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/2.kiali.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/3.istio-tracing.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/4.istio-core.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/5.istio-ingressgateway.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/6.istio-metric.yaml
+    $ wget https://github.com/tmax-cloud/install-istio/blob/5.0/yaml/bookinfo.yaml
     ```
   
 2. 위의 과정에서 생성한 tar 파일들을 폐쇄망 환경으로 이동시킨 뒤 사용하려는 registry에 이미지를 push한다.
@@ -103,14 +103,14 @@
 
 
 ## Install Steps
-0. [istio yaml 수정](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step0-istio-yaml-%EC%88%98%EC%A0%95)
-1. [istio namespace 및 customresourcedefinition 생성](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-1-istio-namespace-%EB%B0%8F-customresourcedefinition-%EC%83%9D%EC%84%B1)
-2. [kiali 설치](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-2-kiali-%EC%84%A4%EC%B9%98)
-3. [istio-tracing 설치](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-3-istio-tracing-%EC%84%A4%EC%B9%98)
-4. [istiod 설치](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-4-istiod-%EC%84%A4%EC%B9%98)
-5. [istio-ingressgateway 설치](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-5-istio-ingressgateway-%EC%84%A4%EC%B9%98)
-6. [istio metric prometheus에 등록](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-6-istio-metric-prometheus%EC%97%90-%EB%93%B1%EB%A1%9D)
-7. [bookinfo 예제](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Istio#step-7-bookinfo-%EC%98%88%EC%A0%9C)
+0. [istio yaml 수정](https://github.com/tmax-cloud/install-istio/tree/5.0#step0-istio-yaml-%EC%88%98%EC%A0%95)
+1. [istio namespace 및 customresourcedefinition 생성](https://github.com/tmax-cloud/install-istio/tree/5.0#step-1-istio-namespace-%EB%B0%8F-customresourcedefinition-%EC%83%9D%EC%84%B1)
+2. [kiali 설치](https://github.com/tmax-cloud/install-istio/tree/5.0#step-2-kiali-%EC%84%A4%EC%B9%98)
+3. [istio-tracing 설치](https://github.com/tmax-cloud/install-istio/tree/5.0#step-3-istio-tracing-%EC%84%A4%EC%B9%98)
+4. [istiod 설치](https://github.com/tmax-cloud/install-istio/tree/5.0#step-4-istiod-%EC%84%A4%EC%B9%98)
+5. [istio-ingressgateway 설치](https://github.com/tmax-cloud/install-istio/tree/5.0#step-5-istio-ingressgateway-%EC%84%A4%EC%B9%98)
+6. [istio metric prometheus에 등록](https://github.com/tmax-cloud/install-istio/tree/5.0#step-6-istio-metric-prometheus%EC%97%90-%EB%93%B1%EB%A1%9D)
+7. [bookinfo 예제](https://github.com/tmax-cloud/install-istio/tree/5.0#step-7-bookinfo-%EC%98%88%EC%A0%9C)
 
 
 ## Step0. istio yaml 수정
@@ -158,8 +158,8 @@
     * kilai pod가 running임을 확인한 뒤 http://$KIALI_URL/api/kiali 에 접속해 정상 동작을 확인한다.
     * hypercloud console 과 연동을 위해 https 서버가 필요하여 tls secret 생성 및 ingress를 생성해야한다.
         * tls sercet 생성 `ex) kubectl create secret tls kiali-https-secret --key tls.key --cert tls.crt -n istio-system`
-            * key, crt 파일 생성은 console tls secret 생성 [참조](https://github.com/tmax-cloud/hypercloud-install-guide/tree/master/Console#step-2-secret-tls-%EC%83%9D%EC%84%B1)	
-        * [kiali-ingress.yaml](ayml/kiali-ingress.yaml) 실행하여 ingress 생성 `ex) kubectl apply -f kiali-ingress.yaml`
+            * key, crt 파일 생성은 console tls secret 생성 [참조](https://github.com/tmax-cloud/install-console#step-2-secret-tls-%EC%83%9D%EC%84%B1)	
+        * [kiali-ingress.yaml](yaml/kiali-ingress.yaml) 실행하여 ingress 생성 `ex) kubectl apply -f kiali-ingress.yaml`
 * 비고 :
     * kiali에 접속하기 위한 서비스를 [원하는 타입](yaml/2.kiali.yaml#L346)으로 변경할 수 있다.
     * kiali에 접속하기 위한 방식을 [strategy](yaml/2.kiali.yaml#L184)를 configmap을 수정해 변경할 수 있다.    
