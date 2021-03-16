@@ -53,7 +53,7 @@
     * install yaml을 다운로드한다.
     ```bash
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/blob/master/yaml/1.istio-base.yaml
-    $ wget hhttps://raw.githubusercontent.com/tmax-cloud/install-istio/blob/master/yaml/2.istio-tracing.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/blob/master/yaml/2.istio-tracing.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/blob/master/yaml/3.istio-core.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/blob/master/yaml/4.istio-ingressgateway.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/blob/master/yaml/5.istio-metric.yaml
