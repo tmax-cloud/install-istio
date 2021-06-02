@@ -18,39 +18,8 @@
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. **폐쇄망에서 설치하는 경우** 사용하는 image repository에 istio 설치 시 필요한 이미지를 push한다. 
-
-    * 작업 디렉토리 생성 및 환경 설정
-    ```bash
-    $ mkdir -p ~/istio-install
-    $ export ISTIO_HOME=~/istio-install
-    $ export ISTIO_VERSION=1.5.1
-    $ export JAEGER_VERSION=1.16
-    $ export REGISTRY=[IP:PORT]
-    $ cd $ISTIO_HOME
-    ```
-    * 외부 네트워크 통신이 가능한 환경에서 필요한 이미지를 다운받는다.
-    ```bash
-    $ sudo docker pull istio/pilot:${ISTIO_VERSION}
-    $ sudo docker save istio/pilot:${ISTIO_VERSION} > istio-pilot_${ISTIO_VERSION}.tar
-    $ sudo docker pull istio/proxyv2:${ISTIO_VERSION}
-    $ sudo docker save istio/proxyv2:${ISTIO_VERSION} > istio-proxyv2_${ISTIO_VERSION}.tar
-    $ sudo docker pull jaegertracing/all-in-one:${JAEGER_VERSION}
-    $ sudo docker save jaegertracing/all-in-one:${JAEGER_VERSION} > jaeger_${JAEGER_VERSION}.tar
-    // bookinfo example images
-    $ sudo docker pull istio/examples-bookinfo-productpage-v1:1.15.0
-    $ sudo docker pull istio/examples-bookinfo-details-v1:1.15.0
-    $ sudo docker pull istio/examples-bookinfo-ratings-v1:1.15.0
-    $ sudo docker pull istio/examples-bookinfo-reviews-v1:1.15.0
-    $ sudo docker pull istio/examples-bookinfo-reviews-v2:1.15.0
-    $ sudo docker pull istio/examples-bookinfo-reviews-v3:1.15.0
-    $ sudo docker save istio/examples-bookinfo-productpage-v1:1.15.0 > productpage.tar
-    $ sudo docker save istio/examples-bookinfo-details-v1:1.15.0 > details.tar
-    $ sudo docker save istio/examples-bookinfo-ratings-v1:1.15.0 > ratings.tar
-    $ sudo docker save istio/examples-bookinfo-reviews-v1:1.15.0 > reviews-v1.tar
-    $ sudo docker save istio/examples-bookinfo-reviews-v2:1.15.0 > reviews-v2.tar
-    $ sudo docker save istio/examples-bookinfo-reviews-v3:1.15.0 > reviews-v3.tar
-    ```
-    * install yaml을 다운로드한다.
+    - [install-registry 이미지 푸시하기 참조](https://github.com/tmax-cloud/install-registry/blob/5.0/podman.md)  
+2. install yaml을 다운로드한다.
     ```bash
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/1.istio-base.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/2.istio-tracing.yaml
@@ -59,40 +28,6 @@
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/5.istio-metric.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/bookinfo.yaml
     ```
-  
-2. 위의 과정에서 생성한 tar 파일들을 폐쇄망 환경으로 이동시킨 뒤 사용하려는 registry에 이미지를 push한다.
-    ```bash
-    $ sudo docker load < istio-pilot_${ISTIO_VERSION}.tar
-    $ sudo docker load < istio-proxyv2_${ISTIO_VERSION}.tar
-    $ sudo docker load < jaeger_${JAEGER_VERSION}.tar
-    $ sudo docker load < productpage.tar
-    $ sudo docker load < details.tar
-    $ sudo docker load < ratings.tar
-    $ sudo docker load < reviews-v1.tar
-    $ sudo docker load < reviews-v2.tar
-    $ sudo docker load < reviews-v3.tar
-    
-    $ sudo docker tag istio/pilot:${ISTIO_VERSION} ${REGISTRY}/istio/pilot:${ISTIO_VERSION}
-    $ sudo docker tag istio/proxyv2:${ISTIO_VERSION} ${REGISTRY}/istio/proxyv2:${ISTIO_VERSION}
-    $ sudo docker tag jaegertracing/all-in-one:${JAEGER_VERSION} ${REGISTRY}/jaegertracing/all-in-one:${JAEGER_VERSION}
-    $ sudo docker tag istio/examples-bookinfo-productpage-v1:1.15.0 ${REGISTRY}/istio/examples-bookinfo-productpage-v1:1.15.0
-    $ sudo docker tag istio/examples-bookinfo-details-v1:1.15.0 ${REGISTRY}/istio/examples-bookinfo-details-v1:1.15.0
-    $ sudo docker tag istio/examples-bookinfo-ratings-v1:1.15.0 ${REGISTRY}/istio/examples-bookinfo-ratings-v1:1.15.0
-    $ sudo docker tag istio/examples-bookinfo-reviews-v1:1.15.0 ${REGISTRY}/istio/examples-bookinfo-reviews-v1:1.15.0
-    $ sudo docker tag istio/examples-bookinfo-reviews-v2:1.15.0 ${REGISTRY}/istio/examples-bookinfo-reviews-v2:1.15.0
-    $ sudo docker tag istio/examples-bookinfo-reviews-v3:1.15.0 ${REGISTRY}/istio/examples-bookinfo-reviews-v3:1.15.0
-    
-    $ sudo docker push ${REGISTRY}/istio/pilot:${ISTIO_VERSION}
-    $ sudo docker push ${REGISTRY}/istio/proxyv2:${ISTIO_VERSION}
-    $ sudo docker push ${REGISTRY}/jaegertracing/all-in-one:${JAEGER_VERSION}
-    $ sudo docker push ${REGISTRY}/istio/examples-bookinfo-productpage-v1:1.15.0
-    $ sudo docker push ${REGISTRY}/istio/examples-bookinfo-details-v1:1.15.0
-    $ sudo docker push ${REGISTRY}/istio/examples-bookinfo-ratings-v1:1.15.0
-    $ sudo docker push ${REGISTRY}/istio/examples-bookinfo-reviews-v1:1.15.0
-    $ sudo docker push ${REGISTRY}/istio/examples-bookinfo-reviews-v2:1.15.0
-    $ sudo docker push ${REGISTRY}/istio/examples-bookinfo-reviews-v3:1.15.0
-    ```
-
 
 ## Install Steps
 0. [istio yaml 수정](#step0-istio-yaml-%EC%88%98%EC%A0%95)
@@ -109,6 +44,8 @@
 * 생성 순서 : 
     * 아래의 command를 수정하여 사용하고자 하는 image 버전 정보를 수정한다.
 	```bash
+	$ export ISTIO_VERSION=1.5.1
+    	$ export JAEGER_VERSION=1.16
 	$ sed -i 's/{jaeger_version}/'${JAEGER_VERSION}'/g' 2.istio-tracing.yaml
 	$ sed -i 's/{istio_version}/'${ISTIO_VERSION}'/g' 3.istio-core.yaml
 	$ sed -i 's/{istio_version}/'${ISTIO_VERSION}'/g' 4.istio-ingressgateway.yaml
