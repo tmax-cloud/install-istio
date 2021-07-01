@@ -1,0 +1,98 @@
+---
+apiVersion: "apiextensions.k8s.io/v1beta1"
+kind: "CustomResourceDefinition"
+metadata:
+  annotations:
+    helm.sh/resource-policy: "keep"
+  labels:
+    app: "istio-pilot"
+    chart: "istio"
+    heritage: "Tiller"
+    istio: "security"
+    release: "istio"
+  name: "requestauthentications.security.istio.io"
+spec:
+  group: "security.istio.io"
+  names:
+    categories:
+    - "istio-io"
+    - "security-istio-io"
+    kind: "RequestAuthentication"
+    listKind: "RequestAuthenticationList"
+    plural: "requestauthentications"
+    singular: "requestauthentication"
+  scope: "Namespaced"
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec"
+          properties:
+            jwtRules:
+              description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules"
+              items:
+                properties:
+                  audiences:
+                    items:
+                      format: "string"
+                      type: "string"
+                    type: "array"
+                  forwardOriginalToken:
+                    description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.forwardOriginalToken"
+                    type: "boolean"
+                  fromHeaders:
+                    description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.fromHeaders"
+                    items:
+                      properties:
+                        name:
+                          description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.fromHeaders.items.properties.name"
+                          format: "string"
+                          type: "string"
+                        prefix:
+                          description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.fromHeaders.items.properties.prefix"
+                          format: "string"
+                          type: "string"
+                      type: "object"
+                    type: "array"
+                  fromParams:
+                    description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.fromParams"
+                    items:
+                      format: "string"
+                      type: "string"
+                    type: "array"
+                  issuer:
+                    description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.issuer"
+                    format: "string"
+                    type: "string"
+                  jwks:
+                    description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.jwtRules.items.properties.jwks"
+                    format: "string"
+                    type: "string"
+                  jwks_uri:
+                    format: "string"
+                    type: "string"
+                  jwksUri:
+                    format: "string"
+                    type: "string"
+                  outputPayloadToHeader:
+                    format: "string"
+                    type: "string"
+                type: "object"
+              type: "array"
+            selector:
+              description: "%requestauthentications.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.selector"
+              properties:
+                matchLabels:
+                  additionalProperties:
+                    format: "string"
+                    type: "string"
+                  type: "object"
+              type: "object"
+          type: "object"
+      type: "object"
+  versions:
+  - name: "v1beta1"
+    served: true
+    storage: true

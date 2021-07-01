@@ -1,0 +1,641 @@
+---
+apiVersion: "apiextensions.k8s.io/v1beta1"
+kind: "CustomResourceDefinition"
+metadata:
+  annotations:
+    helm.sh/resource-policy: "keep"
+  labels:
+    app: "istio-pilot"
+    chart: "istio"
+    heritage: "Tiller"
+    release: "istio"
+  name: "virtualservices.networking.istio.io"
+spec:
+  additionalPrinterColumns:
+  - JSONPath: ".spec.gateways"
+    description: "The names of gateways and sidecars that should apply these routes"
+    name: "Gateways"
+    type: "string"
+  - JSONPath: ".spec.hosts"
+    description: "The destination hosts to which traffic is being sent"
+    name: "Hosts"
+    type: "string"
+  - JSONPath: ".metadata.creationTimestamp"
+    description: "CreationTimestamp is a timestamp representing the server time when\
+      \ this object was created. It is not guaranteed to be set in happens-before\
+      \ order across separate operations. Clients may not set this value. It is represented\
+      \ in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for\
+      \ lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata"
+    name: "Age"
+    type: "date"
+  group: "networking.istio.io"
+  names:
+    categories:
+    - "istio-io"
+    - "networking-istio-io"
+    kind: "VirtualService"
+    listKind: "VirtualServiceList"
+    plural: "virtualservices"
+    shortNames:
+    - "vs"
+    singular: "virtualservice"
+  scope: "Namespaced"
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec"
+          properties:
+            exportTo:
+              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.exportTo"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            gateways:
+              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.gateways"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            hosts:
+              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.hosts"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            http:
+              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http"
+              items:
+                properties:
+                  corsPolicy:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.corsPolicy"
+                    properties:
+                      allowCredentials:
+                        type: "boolean"
+                      allowHeaders:
+                        items:
+                          format: "string"
+                          type: "string"
+                        type: "array"
+                      allowMethods:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.corsPolicy.properties.allowMethods"
+                        items:
+                          format: "string"
+                          type: "string"
+                        type: "array"
+                      allowOrigin:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.corsPolicy.properties.allowOrigin"
+                        items:
+                          format: "string"
+                          type: "string"
+                        type: "array"
+                      allowOrigins:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.corsPolicy.properties.allowOrigins"
+                        items:
+                          oneOf:
+                          - required:
+                            - "exact"
+                          - required:
+                            - "prefix"
+                          - required:
+                            - "regex"
+                          properties:
+                            exact:
+                              format: "string"
+                              type: "string"
+                            prefix:
+                              format: "string"
+                              type: "string"
+                            regex:
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        type: "array"
+                      exposeHeaders:
+                        items:
+                          format: "string"
+                          type: "string"
+                        type: "array"
+                      maxAge:
+                        type: "string"
+                    type: "object"
+                  fault:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.fault"
+                    properties:
+                      abort:
+                        oneOf:
+                        - required:
+                          - "httpStatus"
+                        - required:
+                          - "grpcStatus"
+                        - required:
+                          - "http2Error"
+                        properties:
+                          grpcStatus:
+                            format: "string"
+                            type: "string"
+                          http2Error:
+                            format: "string"
+                            type: "string"
+                          httpStatus:
+                            description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.fault.properties.abort.properties.httpStatus"
+                            format: "int32"
+                            type: "integer"
+                          percentage:
+                            description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.fault.properties.abort.properties.percentage"
+                            properties:
+                              value:
+                                format: "double"
+                                type: "number"
+                            type: "object"
+                        type: "object"
+                      delay:
+                        oneOf:
+                        - properties:
+                            percent: {}
+                          required:
+                          - "fixedDelay"
+                        - properties:
+                            percent: {}
+                          required:
+                          - "exponentialDelay"
+                        properties:
+                          exponentialDelay:
+                            type: "string"
+                          fixedDelay:
+                            description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.fault.properties.delay.properties.fixedDelay"
+                            type: "string"
+                          percent:
+                            description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.fault.properties.delay.properties.percent"
+                            format: "int32"
+                            type: "integer"
+                          percentage:
+                            description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.fault.properties.delay.properties.percentage"
+                            properties:
+                              value:
+                                format: "double"
+                                type: "number"
+                            type: "object"
+                        type: "object"
+                    type: "object"
+                  headers:
+                    properties:
+                      request:
+                        properties:
+                          add:
+                            additionalProperties:
+                              format: "string"
+                              type: "string"
+                            type: "object"
+                          remove:
+                            items:
+                              format: "string"
+                              type: "string"
+                            type: "array"
+                          set:
+                            additionalProperties:
+                              format: "string"
+                              type: "string"
+                            type: "object"
+                        type: "object"
+                      response:
+                        properties:
+                          add:
+                            additionalProperties:
+                              format: "string"
+                              type: "string"
+                            type: "object"
+                          remove:
+                            items:
+                              format: "string"
+                              type: "string"
+                            type: "array"
+                          set:
+                            additionalProperties:
+                              format: "string"
+                              type: "string"
+                            type: "object"
+                        type: "object"
+                    type: "object"
+                  match:
+                    items:
+                      properties:
+                        authority:
+                          oneOf:
+                          - required:
+                            - "exact"
+                          - required:
+                            - "prefix"
+                          - required:
+                            - "regex"
+                          properties:
+                            exact:
+                              format: "string"
+                              type: "string"
+                            prefix:
+                              format: "string"
+                              type: "string"
+                            regex:
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        gateways:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.match.items.properties.gateways"
+                          items:
+                            format: "string"
+                            type: "string"
+                          type: "array"
+                        headers:
+                          additionalProperties:
+                            oneOf:
+                            - required:
+                              - "exact"
+                            - required:
+                              - "prefix"
+                            - required:
+                              - "regex"
+                            properties:
+                              exact:
+                                format: "string"
+                                type: "string"
+                              prefix:
+                                format: "string"
+                                type: "string"
+                              regex:
+                                format: "string"
+                                type: "string"
+                            type: "object"
+                          type: "object"
+                        ignoreUriCase:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.match.items.properties.ignoreUriCase"
+                          type: "boolean"
+                        method:
+                          oneOf:
+                          - required:
+                            - "exact"
+                          - required:
+                            - "prefix"
+                          - required:
+                            - "regex"
+                          properties:
+                            exact:
+                              format: "string"
+                              type: "string"
+                            prefix:
+                              format: "string"
+                              type: "string"
+                            regex:
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        name:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.match.items.properties.name"
+                          format: "string"
+                          type: "string"
+                        port:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.match.items.properties.port"
+                          type: "integer"
+                        queryParams:
+                          additionalProperties:
+                            oneOf:
+                            - required:
+                              - "exact"
+                            - required:
+                              - "prefix"
+                            - required:
+                              - "regex"
+                            properties:
+                              exact:
+                                format: "string"
+                                type: "string"
+                              prefix:
+                                format: "string"
+                                type: "string"
+                              regex:
+                                format: "string"
+                                type: "string"
+                            type: "object"
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.match.items.properties.queryParams"
+                          type: "object"
+                        scheme:
+                          oneOf:
+                          - required:
+                            - "exact"
+                          - required:
+                            - "prefix"
+                          - required:
+                            - "regex"
+                          properties:
+                            exact:
+                              format: "string"
+                              type: "string"
+                            prefix:
+                              format: "string"
+                              type: "string"
+                            regex:
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        sourceLabels:
+                          additionalProperties:
+                            format: "string"
+                            type: "string"
+                          type: "object"
+                        uri:
+                          oneOf:
+                          - required:
+                            - "exact"
+                          - required:
+                            - "prefix"
+                          - required:
+                            - "regex"
+                          properties:
+                            exact:
+                              format: "string"
+                              type: "string"
+                            prefix:
+                              format: "string"
+                              type: "string"
+                            regex:
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                      type: "object"
+                    type: "array"
+                  mirror:
+                    properties:
+                      host:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.mirror.properties.host"
+                        format: "string"
+                        type: "string"
+                      port:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.mirror.properties.port"
+                        properties:
+                          number:
+                            type: "integer"
+                        type: "object"
+                      subset:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.mirror.properties.subset"
+                        format: "string"
+                        type: "string"
+                    type: "object"
+                  mirror_percent:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.mirror_percent"
+                    type: "integer"
+                  mirrorPercent:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.mirrorPercent"
+                    type: "integer"
+                  mirrorPercentage:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.mirrorPercentage"
+                    properties:
+                      value:
+                        format: "double"
+                        type: "number"
+                    type: "object"
+                  name:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.name"
+                    format: "string"
+                    type: "string"
+                  redirect:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.redirect"
+                    properties:
+                      authority:
+                        format: "string"
+                        type: "string"
+                      redirectCode:
+                        type: "integer"
+                      uri:
+                        format: "string"
+                        type: "string"
+                    type: "object"
+                  retries:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.retries"
+                    properties:
+                      attempts:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.retries.properties.attempts"
+                        format: "int32"
+                        type: "integer"
+                      perTryTimeout:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.retries.properties.perTryTimeout"
+                        type: "string"
+                      retryOn:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.retries.properties.retryOn"
+                        format: "string"
+                        type: "string"
+                    type: "object"
+                  rewrite:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.rewrite"
+                    properties:
+                      authority:
+                        description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.rewrite.properties.authority"
+                        format: "string"
+                        type: "string"
+                      uri:
+                        format: "string"
+                        type: "string"
+                    type: "object"
+                  route:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.route"
+                    items:
+                      properties:
+                        destination:
+                          properties:
+                            host:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.route.items.properties.destination.properties.host"
+                              format: "string"
+                              type: "string"
+                            port:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.route.items.properties.destination.properties.port"
+                              properties:
+                                number:
+                                  type: "integer"
+                              type: "object"
+                            subset:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.route.items.properties.destination.properties.subset"
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        headers:
+                          properties:
+                            request:
+                              properties:
+                                add:
+                                  additionalProperties:
+                                    format: "string"
+                                    type: "string"
+                                  type: "object"
+                                remove:
+                                  items:
+                                    format: "string"
+                                    type: "string"
+                                  type: "array"
+                                set:
+                                  additionalProperties:
+                                    format: "string"
+                                    type: "string"
+                                  type: "object"
+                              type: "object"
+                            response:
+                              properties:
+                                add:
+                                  additionalProperties:
+                                    format: "string"
+                                    type: "string"
+                                  type: "object"
+                                remove:
+                                  items:
+                                    format: "string"
+                                    type: "string"
+                                  type: "array"
+                                set:
+                                  additionalProperties:
+                                    format: "string"
+                                    type: "string"
+                                  type: "object"
+                              type: "object"
+                          type: "object"
+                        weight:
+                          format: "int32"
+                          type: "integer"
+                      type: "object"
+                    type: "array"
+                  timeout:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.http.items.properties.timeout"
+                    type: "string"
+                type: "object"
+              type: "array"
+            tcp:
+              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp"
+              items:
+                properties:
+                  match:
+                    items:
+                      properties:
+                        destinationSubnets:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.match.items.properties.destinationSubnets"
+                          items:
+                            format: "string"
+                            type: "string"
+                          type: "array"
+                        gateways:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.match.items.properties.gateways"
+                          items:
+                            format: "string"
+                            type: "string"
+                          type: "array"
+                        port:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.match.items.properties.port"
+                          type: "integer"
+                        sourceLabels:
+                          additionalProperties:
+                            format: "string"
+                            type: "string"
+                          type: "object"
+                        sourceSubnet:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.match.items.properties.sourceSubnet"
+                          format: "string"
+                          type: "string"
+                      type: "object"
+                    type: "array"
+                  route:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.route"
+                    items:
+                      properties:
+                        destination:
+                          properties:
+                            host:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.route.items.properties.destination.properties.host"
+                              format: "string"
+                              type: "string"
+                            port:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.route.items.properties.destination.properties.port"
+                              properties:
+                                number:
+                                  type: "integer"
+                              type: "object"
+                            subset:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tcp.items.properties.route.items.properties.destination.properties.subset"
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        weight:
+                          format: "int32"
+                          type: "integer"
+                      type: "object"
+                    type: "array"
+                type: "object"
+              type: "array"
+            tls:
+              items:
+                properties:
+                  match:
+                    items:
+                      properties:
+                        destinationSubnets:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.match.items.properties.destinationSubnets"
+                          items:
+                            format: "string"
+                            type: "string"
+                          type: "array"
+                        gateways:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.match.items.properties.gateways"
+                          items:
+                            format: "string"
+                            type: "string"
+                          type: "array"
+                        port:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.match.items.properties.port"
+                          type: "integer"
+                        sniHosts:
+                          description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.match.items.properties.sniHosts"
+                          items:
+                            format: "string"
+                            type: "string"
+                          type: "array"
+                        sourceLabels:
+                          additionalProperties:
+                            format: "string"
+                            type: "string"
+                          type: "object"
+                      type: "object"
+                    type: "array"
+                  route:
+                    description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.route"
+                    items:
+                      properties:
+                        destination:
+                          properties:
+                            host:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.route.items.properties.destination.properties.host"
+                              format: "string"
+                              type: "string"
+                            port:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.route.items.properties.destination.properties.port"
+                              properties:
+                                number:
+                                  type: "integer"
+                              type: "object"
+                            subset:
+                              description: "%virtualservices.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.tls.items.properties.route.items.properties.destination.properties.subset"
+                              format: "string"
+                              type: "string"
+                          type: "object"
+                        weight:
+                          format: "int32"
+                          type: "integer"
+                      type: "object"
+                    type: "array"
+                type: "object"
+              type: "array"
+          type: "object"
+      type: "object"
+  versions:
+  - name: "v1alpha3"
+    served: true
+    storage: true
+  - name: "v1beta1"
+    served: true
+    storage: false

@@ -1,0 +1,146 @@
+---
+apiVersion: "apiextensions.k8s.io/v1beta1"
+kind: "CustomResourceDefinition"
+metadata:
+  annotations:
+    helm.sh/resource-policy: "keep"
+  labels:
+    app: "istio-pilot"
+    chart: "istio"
+    heritage: "Tiller"
+    release: "istio"
+  name: "serviceentries.networking.istio.io"
+spec:
+  additionalPrinterColumns:
+  - JSONPath: ".spec.hosts"
+    description: "The hosts associated with the ServiceEntry"
+    name: "Hosts"
+    type: "string"
+  - JSONPath: ".spec.location"
+    description: "Whether the service is external to the mesh or part of the mesh\
+      \ (MESH_EXTERNAL or MESH_INTERNAL)"
+    name: "Location"
+    type: "string"
+  - JSONPath: ".spec.resolution"
+    description: "Service discovery mode for the hosts (NONE, STATIC, or DNS)"
+    name: "Resolution"
+    type: "string"
+  - JSONPath: ".metadata.creationTimestamp"
+    description: "CreationTimestamp is a timestamp representing the server time when\
+      \ this object was created. It is not guaranteed to be set in happens-before\
+      \ order across separate operations. Clients may not set this value. It is represented\
+      \ in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for\
+      \ lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata"
+    name: "Age"
+    type: "date"
+  group: "networking.istio.io"
+  names:
+    categories:
+    - "istio-io"
+    - "networking-istio-io"
+    kind: "ServiceEntry"
+    listKind: "ServiceEntryList"
+    plural: "serviceentries"
+    shortNames:
+    - "se"
+    singular: "serviceentry"
+  scope: "Namespaced"
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec"
+          properties:
+            addresses:
+              description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.addresses"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            endpoints:
+              description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.endpoints"
+              items:
+                properties:
+                  address:
+                    format: "string"
+                    type: "string"
+                  labels:
+                    additionalProperties:
+                      format: "string"
+                      type: "string"
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.endpoints.items.properties.labels"
+                    type: "object"
+                  locality:
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.endpoints.items.properties.locality"
+                    format: "string"
+                    type: "string"
+                  network:
+                    format: "string"
+                    type: "string"
+                  ports:
+                    additionalProperties:
+                      type: "integer"
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.endpoints.items.properties.ports"
+                    type: "object"
+                  weight:
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.endpoints.items.properties.weight"
+                    type: "integer"
+                type: "object"
+              type: "array"
+            exportTo:
+              description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.exportTo"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            hosts:
+              description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.hosts"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            location:
+              enum:
+              - "MESH_EXTERNAL"
+              - "MESH_INTERNAL"
+              type: "string"
+            ports:
+              description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.ports"
+              items:
+                properties:
+                  name:
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.ports.items.properties.name"
+                    format: "string"
+                    type: "string"
+                  number:
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.ports.items.properties.number"
+                    type: "integer"
+                  protocol:
+                    description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.ports.items.properties.protocol"
+                    format: "string"
+                    type: "string"
+                type: "object"
+              type: "array"
+            resolution:
+              description: "%serviceentries.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.resolution"
+              enum:
+              - "NONE"
+              - "STATIC"
+              - "DNS"
+              type: "string"
+            subjectAltNames:
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+          type: "object"
+      type: "object"
+  versions:
+  - name: "v1alpha3"
+    served: true
+    storage: true
+  - name: "v1beta1"
+    served: true
+    storage: false

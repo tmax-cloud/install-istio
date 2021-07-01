@@ -1,0 +1,888 @@
+---
+apiVersion: "apiextensions.k8s.io/v1beta1"
+kind: "CustomResourceDefinition"
+metadata:
+  annotations:
+    helm.sh/resource-policy: "keep"
+  labels:
+    app: "istio-pilot"
+    chart: "istio"
+    heritage: "Tiller"
+    release: "istio"
+  name: "destinationrules.networking.istio.io"
+spec:
+  additionalPrinterColumns:
+  - JSONPath: ".spec.host"
+    description: "The name of a service from the service registry"
+    name: "Host"
+    type: "string"
+  - JSONPath: ".metadata.creationTimestamp"
+    description: "CreationTimestamp is a timestamp representing the server time when\
+      \ this object was created. It is not guaranteed to be set in happens-before\
+      \ order across separate operations. Clients may not set this value. It is represented\
+      \ in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for\
+      \ lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata"
+    name: "Age"
+    type: "date"
+  group: "networking.istio.io"
+  names:
+    categories:
+    - "istio-io"
+    - "networking-istio-io"
+    kind: "DestinationRule"
+    listKind: "DestinationRuleList"
+    plural: "destinationrules"
+    shortNames:
+    - "dr"
+    singular: "destinationrule"
+  scope: "Namespaced"
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec"
+          properties:
+            exportTo:
+              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.exportTo"
+              items:
+                format: "string"
+                type: "string"
+              type: "array"
+            host:
+              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.host"
+              format: "string"
+              type: "string"
+            subsets:
+              items:
+                properties:
+                  labels:
+                    additionalProperties:
+                      format: "string"
+                      type: "string"
+                    type: "object"
+                  name:
+                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.name"
+                    format: "string"
+                    type: "string"
+                  trafficPolicy:
+                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy"
+                    properties:
+                      connectionPool:
+                        properties:
+                          http:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.http"
+                            properties:
+                              h2UpgradePolicy:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.http.properties.h2UpgradePolicy"
+                                enum:
+                                - "DEFAULT"
+                                - "DO_NOT_UPGRADE"
+                                - "UPGRADE"
+                                type: "string"
+                              http1MaxPendingRequests:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.http.properties.http1MaxPendingRequests"
+                                format: "int32"
+                                type: "integer"
+                              http2MaxRequests:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.http.properties.http2MaxRequests"
+                                format: "int32"
+                                type: "integer"
+                              idleTimeout:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.http.properties.idleTimeout"
+                                type: "string"
+                              maxRequestsPerConnection:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.http.properties.maxRequestsPerConnection"
+                                format: "int32"
+                                type: "integer"
+                              maxRetries:
+                                format: "int32"
+                                type: "integer"
+                            type: "object"
+                          tcp:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.tcp"
+                            properties:
+                              connectTimeout:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.connectTimeout"
+                                type: "string"
+                              maxConnections:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.maxConnections"
+                                format: "int32"
+                                type: "integer"
+                              tcpKeepalive:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.tcpKeepalive"
+                                properties:
+                                  interval:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.tcpKeepalive.properties.interval"
+                                    type: "string"
+                                  probes:
+                                    type: "integer"
+                                  time:
+                                    type: "string"
+                                type: "object"
+                            type: "object"
+                        type: "object"
+                      loadBalancer:
+                        description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer"
+                        oneOf:
+                        - required:
+                          - "simple"
+                        - properties:
+                            consistentHash:
+                              oneOf:
+                              - required:
+                                - "httpHeaderName"
+                              - required:
+                                - "httpCookie"
+                              - required:
+                                - "useSourceIp"
+                          required:
+                          - "consistentHash"
+                        properties:
+                          consistentHash:
+                            properties:
+                              httpCookie:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie"
+                                properties:
+                                  name:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.name"
+                                    format: "string"
+                                    type: "string"
+                                  path:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.path"
+                                    format: "string"
+                                    type: "string"
+                                  ttl:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.ttl"
+                                    type: "string"
+                                type: "object"
+                              httpHeaderName:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpHeaderName"
+                                format: "string"
+                                type: "string"
+                              minimumRingSize:
+                                type: "integer"
+                              useSourceIp:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.useSourceIp"
+                                type: "boolean"
+                            type: "object"
+                          localityLbSetting:
+                            properties:
+                              distribute:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.distribute"
+                                items:
+                                  properties:
+                                    from:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.from"
+                                      format: "string"
+                                      type: "string"
+                                    to:
+                                      additionalProperties:
+                                        type: "integer"
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.to"
+                                      type: "object"
+                                  type: "object"
+                                type: "array"
+                              enabled:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.enabled"
+                                type: "boolean"
+                              failover:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.failover"
+                                items:
+                                  properties:
+                                    from:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.failover.items.properties.from"
+                                      format: "string"
+                                      type: "string"
+                                    to:
+                                      format: "string"
+                                      type: "string"
+                                  type: "object"
+                                type: "array"
+                            type: "object"
+                          simple:
+                            enum:
+                            - "ROUND_ROBIN"
+                            - "LEAST_CONN"
+                            - "RANDOM"
+                            - "PASSTHROUGH"
+                            type: "string"
+                        type: "object"
+                      outlierDetection:
+                        properties:
+                          baseEjectionTime:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.outlierDetection.properties.baseEjectionTime"
+                            type: "string"
+                          consecutive5xxErrors:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.outlierDetection.properties.consecutive5xxErrors"
+                            type: "integer"
+                          consecutiveErrors:
+                            format: "int32"
+                            type: "integer"
+                          consecutiveGatewayErrors:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.outlierDetection.properties.consecutiveGatewayErrors"
+                            type: "integer"
+                          interval:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.outlierDetection.properties.interval"
+                            type: "string"
+                          maxEjectionPercent:
+                            format: "int32"
+                            type: "integer"
+                          minHealthPercent:
+                            format: "int32"
+                            type: "integer"
+                        type: "object"
+                      portLevelSettings:
+                        description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings"
+                        items:
+                          properties:
+                            connectionPool:
+                              properties:
+                                http:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http"
+                                  properties:
+                                    h2UpgradePolicy:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.h2UpgradePolicy"
+                                      enum:
+                                      - "DEFAULT"
+                                      - "DO_NOT_UPGRADE"
+                                      - "UPGRADE"
+                                      type: "string"
+                                    http1MaxPendingRequests:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.http1MaxPendingRequests"
+                                      format: "int32"
+                                      type: "integer"
+                                    http2MaxRequests:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.http2MaxRequests"
+                                      format: "int32"
+                                      type: "integer"
+                                    idleTimeout:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.idleTimeout"
+                                      type: "string"
+                                    maxRequestsPerConnection:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.maxRequestsPerConnection"
+                                      format: "int32"
+                                      type: "integer"
+                                    maxRetries:
+                                      format: "int32"
+                                      type: "integer"
+                                  type: "object"
+                                tcp:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp"
+                                  properties:
+                                    connectTimeout:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.connectTimeout"
+                                      type: "string"
+                                    maxConnections:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.maxConnections"
+                                      format: "int32"
+                                      type: "integer"
+                                    tcpKeepalive:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.tcpKeepalive"
+                                      properties:
+                                        interval:
+                                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.tcpKeepalive.properties.interval"
+                                          type: "string"
+                                        probes:
+                                          type: "integer"
+                                        time:
+                                          type: "string"
+                                      type: "object"
+                                  type: "object"
+                              type: "object"
+                            loadBalancer:
+                              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer"
+                              oneOf:
+                              - required:
+                                - "simple"
+                              - properties:
+                                  consistentHash:
+                                    oneOf:
+                                    - required:
+                                      - "httpHeaderName"
+                                    - required:
+                                      - "httpCookie"
+                                    - required:
+                                      - "useSourceIp"
+                                required:
+                                - "consistentHash"
+                              properties:
+                                consistentHash:
+                                  properties:
+                                    httpCookie:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie"
+                                      properties:
+                                        name:
+                                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.name"
+                                          format: "string"
+                                          type: "string"
+                                        path:
+                                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.path"
+                                          format: "string"
+                                          type: "string"
+                                        ttl:
+                                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.ttl"
+                                          type: "string"
+                                      type: "object"
+                                    httpHeaderName:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpHeaderName"
+                                      format: "string"
+                                      type: "string"
+                                    minimumRingSize:
+                                      type: "integer"
+                                    useSourceIp:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.useSourceIp"
+                                      type: "boolean"
+                                  type: "object"
+                                localityLbSetting:
+                                  properties:
+                                    distribute:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.distribute"
+                                      items:
+                                        properties:
+                                          from:
+                                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.from"
+                                            format: "string"
+                                            type: "string"
+                                          to:
+                                            additionalProperties:
+                                              type: "integer"
+                                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.to"
+                                            type: "object"
+                                        type: "object"
+                                      type: "array"
+                                    enabled:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.enabled"
+                                      type: "boolean"
+                                    failover:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.failover"
+                                      items:
+                                        properties:
+                                          from:
+                                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.failover.items.properties.from"
+                                            format: "string"
+                                            type: "string"
+                                          to:
+                                            format: "string"
+                                            type: "string"
+                                        type: "object"
+                                      type: "array"
+                                  type: "object"
+                                simple:
+                                  enum:
+                                  - "ROUND_ROBIN"
+                                  - "LEAST_CONN"
+                                  - "RANDOM"
+                                  - "PASSTHROUGH"
+                                  type: "string"
+                              type: "object"
+                            outlierDetection:
+                              properties:
+                                baseEjectionTime:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.baseEjectionTime"
+                                  type: "string"
+                                consecutive5xxErrors:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.consecutive5xxErrors"
+                                  type: "integer"
+                                consecutiveErrors:
+                                  format: "int32"
+                                  type: "integer"
+                                consecutiveGatewayErrors:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.consecutiveGatewayErrors"
+                                  type: "integer"
+                                interval:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.interval"
+                                  type: "string"
+                                maxEjectionPercent:
+                                  format: "int32"
+                                  type: "integer"
+                                minHealthPercent:
+                                  format: "int32"
+                                  type: "integer"
+                              type: "object"
+                            port:
+                              properties:
+                                number:
+                                  type: "integer"
+                              type: "object"
+                            tls:
+                              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls"
+                              properties:
+                                caCertificates:
+                                  format: "string"
+                                  type: "string"
+                                clientCertificate:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls.properties.clientCertificate"
+                                  format: "string"
+                                  type: "string"
+                                mode:
+                                  enum:
+                                  - "DISABLE"
+                                  - "SIMPLE"
+                                  - "MUTUAL"
+                                  - "ISTIO_MUTUAL"
+                                  type: "string"
+                                privateKey:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls.properties.privateKey"
+                                  format: "string"
+                                  type: "string"
+                                sni:
+                                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls.properties.sni"
+                                  format: "string"
+                                  type: "string"
+                                subjectAltNames:
+                                  items:
+                                    format: "string"
+                                    type: "string"
+                                  type: "array"
+                              type: "object"
+                          type: "object"
+                        type: "array"
+                      tls:
+                        description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.tls"
+                        properties:
+                          caCertificates:
+                            format: "string"
+                            type: "string"
+                          clientCertificate:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.tls.properties.clientCertificate"
+                            format: "string"
+                            type: "string"
+                          mode:
+                            enum:
+                            - "DISABLE"
+                            - "SIMPLE"
+                            - "MUTUAL"
+                            - "ISTIO_MUTUAL"
+                            type: "string"
+                          privateKey:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.tls.properties.privateKey"
+                            format: "string"
+                            type: "string"
+                          sni:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.subsets.items.properties.trafficPolicy.properties.tls.properties.sni"
+                            format: "string"
+                            type: "string"
+                          subjectAltNames:
+                            items:
+                              format: "string"
+                              type: "string"
+                            type: "array"
+                        type: "object"
+                    type: "object"
+                type: "object"
+              type: "array"
+            trafficPolicy:
+              properties:
+                connectionPool:
+                  properties:
+                    http:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.http"
+                      properties:
+                        h2UpgradePolicy:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.http.properties.h2UpgradePolicy"
+                          enum:
+                          - "DEFAULT"
+                          - "DO_NOT_UPGRADE"
+                          - "UPGRADE"
+                          type: "string"
+                        http1MaxPendingRequests:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.http.properties.http1MaxPendingRequests"
+                          format: "int32"
+                          type: "integer"
+                        http2MaxRequests:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.http.properties.http2MaxRequests"
+                          format: "int32"
+                          type: "integer"
+                        idleTimeout:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.http.properties.idleTimeout"
+                          type: "string"
+                        maxRequestsPerConnection:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.http.properties.maxRequestsPerConnection"
+                          format: "int32"
+                          type: "integer"
+                        maxRetries:
+                          format: "int32"
+                          type: "integer"
+                      type: "object"
+                    tcp:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.tcp"
+                      properties:
+                        connectTimeout:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.connectTimeout"
+                          type: "string"
+                        maxConnections:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.maxConnections"
+                          format: "int32"
+                          type: "integer"
+                        tcpKeepalive:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.tcpKeepalive"
+                          properties:
+                            interval:
+                              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.connectionPool.properties.tcp.properties.tcpKeepalive.properties.interval"
+                              type: "string"
+                            probes:
+                              type: "integer"
+                            time:
+                              type: "string"
+                          type: "object"
+                      type: "object"
+                  type: "object"
+                loadBalancer:
+                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer"
+                  oneOf:
+                  - required:
+                    - "simple"
+                  - properties:
+                      consistentHash:
+                        oneOf:
+                        - required:
+                          - "httpHeaderName"
+                        - required:
+                          - "httpCookie"
+                        - required:
+                          - "useSourceIp"
+                    required:
+                    - "consistentHash"
+                  properties:
+                    consistentHash:
+                      properties:
+                        httpCookie:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie"
+                          properties:
+                            name:
+                              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.name"
+                              format: "string"
+                              type: "string"
+                            path:
+                              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.path"
+                              format: "string"
+                              type: "string"
+                            ttl:
+                              description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.ttl"
+                              type: "string"
+                          type: "object"
+                        httpHeaderName:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.httpHeaderName"
+                          format: "string"
+                          type: "string"
+                        minimumRingSize:
+                          type: "integer"
+                        useSourceIp:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.consistentHash.properties.useSourceIp"
+                          type: "boolean"
+                      type: "object"
+                    localityLbSetting:
+                      properties:
+                        distribute:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.distribute"
+                          items:
+                            properties:
+                              from:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.from"
+                                format: "string"
+                                type: "string"
+                              to:
+                                additionalProperties:
+                                  type: "integer"
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.to"
+                                type: "object"
+                            type: "object"
+                          type: "array"
+                        enabled:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.enabled"
+                          type: "boolean"
+                        failover:
+                          description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.failover"
+                          items:
+                            properties:
+                              from:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.loadBalancer.properties.localityLbSetting.properties.failover.items.properties.from"
+                                format: "string"
+                                type: "string"
+                              to:
+                                format: "string"
+                                type: "string"
+                            type: "object"
+                          type: "array"
+                      type: "object"
+                    simple:
+                      enum:
+                      - "ROUND_ROBIN"
+                      - "LEAST_CONN"
+                      - "RANDOM"
+                      - "PASSTHROUGH"
+                      type: "string"
+                  type: "object"
+                outlierDetection:
+                  properties:
+                    baseEjectionTime:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.outlierDetection.properties.baseEjectionTime"
+                      type: "string"
+                    consecutive5xxErrors:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.outlierDetection.properties.consecutive5xxErrors"
+                      type: "integer"
+                    consecutiveErrors:
+                      format: "int32"
+                      type: "integer"
+                    consecutiveGatewayErrors:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.outlierDetection.properties.consecutiveGatewayErrors"
+                      type: "integer"
+                    interval:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.outlierDetection.properties.interval"
+                      type: "string"
+                    maxEjectionPercent:
+                      format: "int32"
+                      type: "integer"
+                    minHealthPercent:
+                      format: "int32"
+                      type: "integer"
+                  type: "object"
+                portLevelSettings:
+                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings"
+                  items:
+                    properties:
+                      connectionPool:
+                        properties:
+                          http:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http"
+                            properties:
+                              h2UpgradePolicy:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.h2UpgradePolicy"
+                                enum:
+                                - "DEFAULT"
+                                - "DO_NOT_UPGRADE"
+                                - "UPGRADE"
+                                type: "string"
+                              http1MaxPendingRequests:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.http1MaxPendingRequests"
+                                format: "int32"
+                                type: "integer"
+                              http2MaxRequests:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.http2MaxRequests"
+                                format: "int32"
+                                type: "integer"
+                              idleTimeout:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.idleTimeout"
+                                type: "string"
+                              maxRequestsPerConnection:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.http.properties.maxRequestsPerConnection"
+                                format: "int32"
+                                type: "integer"
+                              maxRetries:
+                                format: "int32"
+                                type: "integer"
+                            type: "object"
+                          tcp:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp"
+                            properties:
+                              connectTimeout:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.connectTimeout"
+                                type: "string"
+                              maxConnections:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.maxConnections"
+                                format: "int32"
+                                type: "integer"
+                              tcpKeepalive:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.tcpKeepalive"
+                                properties:
+                                  interval:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.connectionPool.properties.tcp.properties.tcpKeepalive.properties.interval"
+                                    type: "string"
+                                  probes:
+                                    type: "integer"
+                                  time:
+                                    type: "string"
+                                type: "object"
+                            type: "object"
+                        type: "object"
+                      loadBalancer:
+                        description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer"
+                        oneOf:
+                        - required:
+                          - "simple"
+                        - properties:
+                            consistentHash:
+                              oneOf:
+                              - required:
+                                - "httpHeaderName"
+                              - required:
+                                - "httpCookie"
+                              - required:
+                                - "useSourceIp"
+                          required:
+                          - "consistentHash"
+                        properties:
+                          consistentHash:
+                            properties:
+                              httpCookie:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie"
+                                properties:
+                                  name:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.name"
+                                    format: "string"
+                                    type: "string"
+                                  path:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.path"
+                                    format: "string"
+                                    type: "string"
+                                  ttl:
+                                    description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpCookie.properties.ttl"
+                                    type: "string"
+                                type: "object"
+                              httpHeaderName:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.httpHeaderName"
+                                format: "string"
+                                type: "string"
+                              minimumRingSize:
+                                type: "integer"
+                              useSourceIp:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.consistentHash.properties.useSourceIp"
+                                type: "boolean"
+                            type: "object"
+                          localityLbSetting:
+                            properties:
+                              distribute:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.distribute"
+                                items:
+                                  properties:
+                                    from:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.from"
+                                      format: "string"
+                                      type: "string"
+                                    to:
+                                      additionalProperties:
+                                        type: "integer"
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.distribute.items.properties.to"
+                                      type: "object"
+                                  type: "object"
+                                type: "array"
+                              enabled:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.enabled"
+                                type: "boolean"
+                              failover:
+                                description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.failover"
+                                items:
+                                  properties:
+                                    from:
+                                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.loadBalancer.properties.localityLbSetting.properties.failover.items.properties.from"
+                                      format: "string"
+                                      type: "string"
+                                    to:
+                                      format: "string"
+                                      type: "string"
+                                  type: "object"
+                                type: "array"
+                            type: "object"
+                          simple:
+                            enum:
+                            - "ROUND_ROBIN"
+                            - "LEAST_CONN"
+                            - "RANDOM"
+                            - "PASSTHROUGH"
+                            type: "string"
+                        type: "object"
+                      outlierDetection:
+                        properties:
+                          baseEjectionTime:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.baseEjectionTime"
+                            type: "string"
+                          consecutive5xxErrors:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.consecutive5xxErrors"
+                            type: "integer"
+                          consecutiveErrors:
+                            format: "int32"
+                            type: "integer"
+                          consecutiveGatewayErrors:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.consecutiveGatewayErrors"
+                            type: "integer"
+                          interval:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.outlierDetection.properties.interval"
+                            type: "string"
+                          maxEjectionPercent:
+                            format: "int32"
+                            type: "integer"
+                          minHealthPercent:
+                            format: "int32"
+                            type: "integer"
+                        type: "object"
+                      port:
+                        properties:
+                          number:
+                            type: "integer"
+                        type: "object"
+                      tls:
+                        description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls"
+                        properties:
+                          caCertificates:
+                            format: "string"
+                            type: "string"
+                          clientCertificate:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls.properties.clientCertificate"
+                            format: "string"
+                            type: "string"
+                          mode:
+                            enum:
+                            - "DISABLE"
+                            - "SIMPLE"
+                            - "MUTUAL"
+                            - "ISTIO_MUTUAL"
+                            type: "string"
+                          privateKey:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls.properties.privateKey"
+                            format: "string"
+                            type: "string"
+                          sni:
+                            description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.portLevelSettings.items.properties.tls.properties.sni"
+                            format: "string"
+                            type: "string"
+                          subjectAltNames:
+                            items:
+                              format: "string"
+                              type: "string"
+                            type: "array"
+                        type: "object"
+                    type: "object"
+                  type: "array"
+                tls:
+                  description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.tls"
+                  properties:
+                    caCertificates:
+                      format: "string"
+                      type: "string"
+                    clientCertificate:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.tls.properties.clientCertificate"
+                      format: "string"
+                      type: "string"
+                    mode:
+                      enum:
+                      - "DISABLE"
+                      - "SIMPLE"
+                      - "MUTUAL"
+                      - "ISTIO_MUTUAL"
+                      type: "string"
+                    privateKey:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.tls.properties.privateKey"
+                      format: "string"
+                      type: "string"
+                    sni:
+                      description: "%destinationrules.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.trafficPolicy.properties.tls.properties.sni"
+                      format: "string"
+                      type: "string"
+                    subjectAltNames:
+                      items:
+                        format: "string"
+                        type: "string"
+                      type: "array"
+                  type: "object"
+              type: "object"
+          type: "object"
+      type: "object"
+  versions:
+  - name: "v1alpha3"
+    served: true
+    storage: true
+  - name: "v1beta1"
+    served: true
+    storage: false
