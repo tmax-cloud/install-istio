@@ -28,6 +28,18 @@
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/5.istio-metric.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/bookinfo.yaml
     ```
+3. 번역 CRD를 다운로드한다.
+    ```bash
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/authorizationpolicies.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/destinationrules.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/envoyfilters.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/gateways.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/peerauthentications.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/requestauthentications.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/serviceentries.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/sidecars.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/key-mapping/virtualservices.yaml
+    ```
 
 ## Install Steps
 0. [istio yaml 수정](#step0-istio-yaml-%EC%88%98%EC%A0%95)
@@ -61,7 +73,9 @@
 
 ## Step 1. istio namespace 및 customresourcedefinition 생성
 * 목적 : `istio system namespace, clusterrole, clusterrolebinding, serviceaccount, customresourcedefinition 생성`
-* 생성 순서 : [1.istio-base.yaml](yaml/1.istio-base.yaml) 실행 `ex) kubectl apply -f 1.istio-base.yaml`
+* 생성 순서 : 
+    * [1.istio-base.yaml](yaml/1.istio-base.yaml) `ex) kubectl apply -f 1.istio-base.yaml`
+    * 번역 CRD 반영(yaml/key-mapping/*.yaml)  
 
 ## Step 2. istio-tracing 설치
 * 목적 : `tracing component jaeger 설치`
