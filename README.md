@@ -39,10 +39,10 @@
 
 ## Step0. 폐쇄망 설정
   * `폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다.`
-
+	
 	```bash
   $ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing.yaml
-
+  
 	$ sed -i 's/docker.io\/jaegertracing\/jager-query/'${REGISTRY}'\/jaegertracing\/jaeger-query/g' 2.istio-tracing.yaml
 	$ sed -i 's/docker.io\/jaegertracing\/jaeger-collector/'${REGISTRY}'\/jaegertracing\/jaeger-collector/g' 2.istio-tracing.yaml
 	$ sed -i 's/docker.io\/istio/'${REGISTRY}'\/istio/g' 3.istio-core.yaml
@@ -59,20 +59,31 @@
    ![image](figure/keycloak3.png)
 4. 클라이언트- mapper 생성(Access Token Audience에 포함시키기 위함)
    ![image](figure/keycloak4.png)
+---
+
 ## Step 1. 버전 수정
+
 * 목적 : `설치 위한 정보 기입`
 * 순서 : 알맞은 config 내용 작성 [(version.conf)](./version.conf)
   - CLIENT_ID,CLIENT_SECRET,CLIENT_ROLE은 hyperauth에서 생성한 값을 이용한다
 
+---
+
 ## Step 2. installer 실행
 * 목적 : `설치 위한 쉘 스크립트 실행`
 * 순서 : 권한 부여 및 스크립트 실행
-  `
-  $ sudo chmod +x install.sh
-  $ ./install.sh
-  `
+
+```bash
+$ sudo chmod +x install.sh
+$ ./install.sh
+```
+
+---
+
+
 
 ## Step 3. bookinfo 예제
+
 * 목적 : `istio 설치 검증을 위한 bookinfo 예제`
 * 생성 순서 : [bookinfo.yaml](yaml/bookinfo.yaml) 실행
 * 비고 :
