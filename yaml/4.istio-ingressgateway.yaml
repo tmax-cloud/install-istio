@@ -22,7 +22,6 @@ metadata:
   labels:
     app: istio-ingressgateway
     istio: ingressgateway
-    
     release: istio
 ---
 
@@ -195,7 +194,7 @@ spec:
           value: sni-dnat
         - name: ISTIO_META_CLUSTER_ID
           value: Kubernetes
-        image: docker.io/istio/proxyv2:{istio_version}
+        image: docker.io/istio/proxyv2:{ISTIO_VERSION}
         imagePullPolicy: IfNotPresent
         name: istio-proxy
         ports:
@@ -313,10 +312,31 @@ spec:
   selector:
     app: istio-ingressgateway
     istio: ingressgateway
-  type: LoadBalancer
-
 ---
-
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-system
+  labels:
+    app: istio-ingressgateway
+    istio: ingressgateway
+    release: istio
+  annotations:
+    kubernetes.io/ingress.class: nginx-system
+spec:
+  rules:
+    - host: istio-ingressgateway.{CUSTOM_DOMAIN_NAME}
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: istio-ingressgateway
+                port:
+                  number: 80
+---
 
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
@@ -372,7 +392,6 @@ metadata:
   labels:
     app: istio-ingressgateway
     istio: ingressgateway
-    
     release: istio
 spec:
   minAvailable: 1
@@ -380,7 +399,5 @@ spec:
     matchLabels:
       app: istio-ingressgateway
       istio: ingressgateway
-      
       release: istio
 ---
-

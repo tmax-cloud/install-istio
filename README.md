@@ -4,7 +4,10 @@
 ## 구성 요소 및 버전
 * istiod ([docker.io/istio/pilot:1.5.1](https://hub.docker.com/layers/istio/pilot/1.5.1/images/sha256-818aecc1c73c53af9091ac1d4f500d9d7cec6d135d372d03cffab1addaff4ec0?context=explore))
 * istio-ingressgateway ([docker.io/istio/proxyv2:1.5.1](https://hub.docker.com/layers/istio/proxyv2/1.5.1/images/sha256-3ad9ee2b43b299e5e6d97aaea5ed47dbf3da9293733607d9b52f358313e852ae?context=explore))
-* istio-tracing ([docker.io/jaegertracing/all-in-one:1.16](https://hub.docker.com/layers/jaegertracing/all-in-one/1.16/images/sha256-738442983b772a5d413c8a2c44a5563956adaff224e5b38f52a959124dafc119?context=explore))
+* jaeger-agent[(docker.io/jaegertracing/jager-agent:1.9)](https://hub.docker.com/layers/jaegertracing/jaeger-agent/1.9/images/sha256-f214f1a411a2bbfab2fadd305f28fa2866aaf36d1ac3260901ebf5b58dae3c0e?context=explore)
+* jaeger-query[(docker.io/jaegertracing/jager-queryt:1.9)](https://hub.docker.com/layers/jaegertracing/jaeger-query/1.9/images/sha256-0ca742b990db6e716171cb966225414fb382e96af4ddd0e8b5cca18e832ca36c?context=explore)
+* jaeger-collector[(docker.io/jaegertracing/jager-collector:1.9)](https://hub.docker.com/layers/jaegertracing/jaeger-collector/1.9/images/sha256-17339bf58eced9c025b433219dbe0875d42b67c9b36d6a6b0e8b0fbb03adfdfe?context=explore)
+
 * bookinfo example
     * productpage([docker.io/istio/examples-bookinfo-productpage-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-productpage-v1/1.15.0/images/sha256-0a5eb4795952372251d51f72834bccb7ea01a67cb72fd9b58b757cca103b7524?context=explore))
     * details([docker.io/istio/examples-bookinfo-details-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-details-v1/1.15.0/images/sha256-fce0bcbff0bed09116dacffca15695cd345e0c3788c15b0114a05f654ddecc17?context=explore))
@@ -15,9 +18,11 @@
 
 ## Prerequisites
 
+- EFK (elasticsearch), HpyerAuth
+
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
-1. **폐쇄망에서 설치하는 경우** 사용하는 image repository에 istio 설치 시 필요한 이미지를 push한다. 
+1. **폐쇄망에서 설치하는 경우** 사용하는 image repository에 istio 설치 시 필요한 이미지를 push한다.
     - [install-registry 이미지 푸시하기 참조](https://github.com/tmax-cloud/install-registry/blob/5.0/podman.md)  
 2. install yaml을 다운로드한다.
     ```bash
@@ -30,84 +35,55 @@
     ```
 
 ## Install Steps
-0. [istio yaml 수정](#step0-istio-yaml-%EC%88%98%EC%A0%95)
-1. [istio namespace 및 customresourcedefinition 생성](#step-1-istio-namespace-%EB%B0%8F-customresourcedefinition-%EC%83%9D%EC%84%B1)
-2. [istio-tracing 설치](#step-2-istio-tracing-%EC%84%A4%EC%B9%98)
-3. [istiod 설치](#step-3-istiod-%EC%84%A4%EC%B9%98)
-4. [istio-ingressgateway 설치](#step-4-istio-ingressgateway-%EC%84%A4%EC%B9%98)
-5. [istio metric prometheus에 등록](#step-5-istio-metric-prometheus%EC%97%90-%EB%93%B1%EB%A1%9D)
-6. [bookinfo 예제](#step-6-bookinfo-%EC%98%88%EC%A0%9C)
 
 
-## Step0. istio yaml 수정
-* 목적 : `istio yaml에 이미지 registry, 버전 정보를 수정`
-* 생성 순서 : 
-    * 아래의 command를 수정하여 사용하고자 하는 image 버전 정보를 수정한다.
+## Step0. 폐쇄망 설정
+  * `폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다.`
 	```bash
-	$ export ISTIO_VERSION=1.5.1
-    	$ export JAEGER_VERSION=1.16
-	$ sed -i 's/{jaeger_version}/'${JAEGER_VERSION}'/g' 2.istio-tracing.yaml
-	$ sed -i 's/{istio_version}/'${ISTIO_VERSION}'/g' 3.istio-core.yaml
-	$ sed -i 's/{istio_version}/'${ISTIO_VERSION}'/g' 4.istio-ingressgateway.yaml
-	```
-* 비고 :
-    * `폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다.`
-	```bash
-	$ sed -i 's/docker.io\/jaegertracing\/all-in-one/'${REGISTRY}'\/jaegertracing\/all-in-one/g' 2.istio-tracing.yaml
+	$ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing.yaml
+  $ sed -i 's/docker.io\/jaegertracing\/jager-query/'${REGISTRY}'\/jaegertracing\/jaeger-query/g' 2.istio-tracing.yaml
+  $ sed -i 's/docker.io\/jaegertracing\/jaeger-collector/'${REGISTRY}'\/jaegertracing\/jaeger-collector/g' 2.istio-tracing.yaml
 	$ sed -i 's/docker.io\/istio/'${REGISTRY}'\/istio/g' 3.istio-core.yaml
 	$ sed -i 's/docker.io\/istio\/proxyv2/'${REGISTRY}'\/istio\/proxyv2/g' 4.istio-ingressgateway.yaml
 	$ sed -i 's/docker.io/'${REGISTRY}'/g' bookinfo.yaml
 	```
 
-## Step 1. istio namespace 및 customresourcedefinition 생성
-* 목적 : `istio system namespace, clusterrole, clusterrolebinding, serviceaccount, customresourcedefinition 생성`
-* 생성 순서 : [1.istio-base.yaml](yaml/1.istio-base.yaml) 실행 `ex) kubectl apply -f 1.istio-base.yaml`
+## Step 1. hyperauth API-GATEWAY 연동
+1. 클라이언트 생성
+![image](figure/keycloak1.png)
+2. 클라이언트 role (manager) 생성
+![image](figure/keycloak2.png)
+3. 관리자계정에 manager role 추가
+  - 관리자 계정 / role mappings / client roles : jaeger 에서 생성한 role 을 부여한다.
+![image](figure/keycloak3.png)
+4. 클라이언트- mapper 생성
+  - Access Token Audience에 포함시키기 위함
+![image](figure/keycloak4.png)
 
-## Step 2. istio-tracing 설치
-* 목적 : `tracing component jaeger 설치`
-* 생성 순서 : [2.istio-tracing.yaml](yaml/2.istio-tracing.yaml) 실행
-* 비고 : 
-    * jaeger ui에 접속하기 위한 서비스를 [원하는 타입](yaml/2.istio-tracing.yaml#L245)으로 변경할 수 있다.
-    * istio-tracing pod가 running임을 확인한 뒤 http://$JAEGER_URL/api/jaeger/search 에 접속해 정상 동작을 확인한다.
-    * hypercloud console 과 연동을 위해 jeager default QUERY_BASE_PATH를 수정하였다.
-	
-![image](figure/jaeger-ui.png)
+## Step 1. 버전 수정
+* 목적 : `설치 위한 정보 기입`
+* 순서 : 알맞은 config 내용 작성 [(version.conf)](./version.conf)
+  - CLIENT_ID,CLIENT_SECRET,CLIENT_ROLE은 hyperauth에서 생성한 값을 이용한다
 
-## Step 3. istiod 설치
-* 목적 : `istio core component 설치(istiod deployment, sidecar configmap, mutatingwebhookconfiguration...)`
-* 생성 순서 : [3.istio-core.yaml](yaml/3.istio-core.yaml) 실행
-* 비고 : 
-    * [istio라는 이름의 configmap](yaml/3.istio-core.yaml#L403)을 수정하여 설정을 변경할 수 있다. 관련 설정은 [istio mesh config](https://istio.io/docs/reference/config/istio.mesh.v1alpha1/#MeshConfig)를 참고한다.
-        * access log format을 변경하고 싶은 경우 [mesh.accessLogFormat](yaml/3.istio-core.yaml#L468)을 원하는 format으로 변경한다.
-        * tracing sampling rate을 변경하고 싶은 경우 [value.traceSampling](yaml/3.istio-core.yaml#L459)을 원하는 값으로 변경한다.
+## Step 2. installer 실행
+* 목적 : `설치 위한 쉘 스크립트 실행`
+* 순서 : 권한 부여 및 스크립트 실행
+  `
+  $ sudo chmod +x install.sh
+  $ ./install.sh
+  `
 
-## Step 4. istio-ingressgateway 설치
-* 목적 : `istio ingressgateway 설치`
-* 생성 순서 : [4.istio-ingressgateway.yaml](yaml/4.istio-ingressgateway.yaml) 실행
-
-## Step 5. istio metric prometheus에 등록
-* 목적 : `istio metric을 수집하기 위한 podmonitor 생성`
-* 생성 순서 : [5.istio-metric.yaml](yaml/5.istio-metric.yaml) 실행
-* 비고 : 
-    * http://$PROMETHEUS_URL/graph 에 접속해 'envoy_'로 시작하는 istio 관련 metric이 수집되었는지 확인한다.
-    * 만약 istio 관련 metric이 수집되지 않을 경우, Prometheus의 권한설정 문제일 수 있다. [prometheus-clusterRole.yaml](https://github.com/tmax-cloud/install-prometheus/tree/main/manifest/manifests/prometheus-clusterRole.yaml)을 적용하거나 Prometheus를 최신 버전으로 설치한다.
-
-
-## Step 6. bookinfo 예제
+## Step 3. bookinfo 예제
 * 목적 : `istio 설치 검증을 위한 bookinfo 예제`
 * 생성 순서 : [bookinfo.yaml](yaml/bookinfo.yaml) 실행
-* 비고 : 
+* 비고 :
     * bookinfo 예제 배포
         * application에 접속하기 위해 [service productpage의 타입](yaml/bookinfo.yaml#L278)을 NodePort/LoadBalancer로 변경한다.
-        * bookinfo 예제를 배포할 namespace에 istio-injected=enabled label을 추가한 뒤, bookinfo 예제를 배포한다. 
+        * bookinfo 예제를 배포할 namespace에 istio-injected=enabled label을 추가한 뒤, bookinfo 예제를 배포한다.
         ```bash
         $ kubectl label namespace $YOUR_NAMESPACE istio-injection=enabled
         $ kubectl apply -f bookinfo.yaml -n $YOUR_NAMESPACE
         ```
-    * http://$PRODUCTPAGE_URL/productpage 에 접속해 정상적으로 배포되었는지 확인한 뒤, kiali dashboard(http://$KIALI_URL/kiali)에 접속해 아래 그림과 같이 서비스간에 관계를 표현해주는 그래프가 나오는지 확인한다.
-	
-![image](figure/bookinfo-example.png)
-
 
 ## 인증서 갱신 가이드
 

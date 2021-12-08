@@ -1,259 +1,345 @@
-# Resources for AddonComponents tracing component
-
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: istio-tracing
+  name: jaeger-configuration
   namespace: istio-system
   labels:
     app: jaeger
-    release: istio
-spec:
-  selector:
-    matchLabels:
-      app: jaeger
-  template:
+    app.kubernetes.io/name: jaeger
+data:
+  span-storage-type: elasticsearch
+  collector: |
+    es:
+      server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
+    collector:
+      zipkin:
+        http-port: 9411
+  query: |
+    es:
+      server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
+  agent: |
+    collector:
+      host-port: "jaeger-collector:14267"
+---
+#
+# Copyright 2017-2019 The Jaeger Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License. You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License
+# is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+# or implied. See the License for the specific language governing permissions and limitations under
+# the License.
+#
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
+      namespace: istio-system
+      name: jaeger-collector
       labels:
         app: jaeger
-        release: istio
-      annotations:
-        sidecar.istio.io/inject: "false"
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "14269"
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: collector
     spec:
-      containers:
-        - name: jaeger
-          image: "docker.io/jaegertracing/all-in-one:{jaeger_version}"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 9411
+      selector:
+        matchLabels:
+          app: jaeger
+      replicas: 1
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: jaeger
+            app.kubernetes.io/name: jaeger
+            app.kubernetes.io/component: collector
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "14268"
+        spec:
+          containers:
+            - image: docker.io/jaegertracing/jaeger-collector:{JAEGER_VERSION}
+              name: jaeger-collector
+              args: ["--config-file=/conf/collector.yaml"]
+              ports:
+                - containerPort: 14267
+                  protocol: TCP
+                - containerPort: 14268
+                  protocol: TCP
+                - containerPort: 9411
+                  protocol: TCP
+              readinessProbe:
+                httpGet:
+                  path: "/"
+                  port: 14269
+              volumeMounts:
+                - name: jaeger-configuration-volume
+                  mountPath: /conf
+              env:
+                - name: SPAN_STORAGE_TYPE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: jaeger-configuration
+                      key: span-storage-type
+          volumes:
+            - configMap:
+                name: jaeger-configuration
+                items:
+                  - key: collector
+                    path: collector.yaml
+              name: jaeger-configuration-volume
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      namespace: istio-system
+      name: jaeger-collector
+      labels:
+        app: jaeger
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: collector
+    spec:
+      ports:
+        - name: jaeger-collector-tchannel
+          port: 14267
+          protocol: TCP
+          targetPort: 14267
+        - name: jaeger-collector-http
+          port: 14268
+          protocol: TCP
+          targetPort: 14268
+        - name: jaeger-collector-zipkin
+          port: 9411
+          protocol: TCP
+          targetPort: 9411
+      selector:
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: collector
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: zipkin
+      labels:
+        app: jaeger
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: zipkin
+    spec:
+      ports:
+        - name: jaeger-collector-zipkin
+          port: 9411
+          protocol: TCP
+          targetPort: 9411
+      selector:
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: collector
+      type: ClusterIP
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+      labels:
+        app: jaeger
+        app.kubernetes.io/component: query
+        app.kubernetes.io/name: jaeger
+      name: jaeger-query
+      namespace: istio-system
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: jaeger
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            prometheus.io/port: "16686"
+            prometheus.io/scrape: "true"
+          creationTimestamp: null
+          labels:
+            app: jaeger
+            app.kubernetes.io/component: query
+            app.kubernetes.io/name: jaeger
+        spec:
+          containers:
+          - name: gatekeeper
+            image: quay.io/keycloak/keycloak-gatekeeper:{KEYCLOAK_VERSION}
+            imagePullPolicy: Always
+            args:
+            - --client-id={CLIENT_ID}
+            - --client-secret={CLIENT_SECRET}
+            - --listen=:3000
+            - --upstream-url=http://127.0.0.1:16686
+            - --discovery-url=https://{KEYCLOAK_ADDR}/auth/realms/tmax
+            - --secure-cookie=true
+            - --skip-openid-provider-tls-verify=true
+            - --enable-self-signed-tls
+            - --skip-upstream-tls-verify=true
+            - --enable-default-deny=true
+            - --enable-refresh-tokens=true
+            - --enable-metrics=true
+            - --encryption-key=AgXa7xRcoClDEU0ZDSH4X0XhL5Qy2Z2j
+            - --forbidden-page=/html/access-forbidden.html
+            - --resources=uri=/*|roles={CLIENT_ID}:{CLIENT_ROLE}
+            - --enable-encrypted-token
+            - --verbose
+            ports:
+            - containerPort: 3000
+              name: gatekeeper
+            volumeMounts:
+            - name: gatekeeper-files
+              mountPath: /html
+          - args:
+            - --config-file=/conf/query.yaml
+            env:
+            - name: SPAN_STORAGE_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  key: span-storage-type
+                  name: jaeger-configuration
+            image: docker.io/jaegertracing/jaeger-query:{JAEGER_VERSION}
+            imagePullPolicy: IfNotPresent
+            name: jaeger-query
+            ports:
             - containerPort: 16686
-            - containerPort: 14250
-            - containerPort: 14267
-            - containerPort: 14268
-            - containerPort: 14269
-            - containerPort: 5775
-              protocol: UDP
-            - containerPort: 6831
-              protocol: UDP
-            - containerPort: 6832
-              protocol: UDP
-          env:
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.namespace
-          - name: BADGER_EPHEMERAL
-            value: "false"
-          - name: SPAN_STORAGE_TYPE
-            value: "badger"
-          - name: BADGER_DIRECTORY_VALUE
-            value: "/badger/data"
-          - name: BADGER_DIRECTORY_KEY
-            value: "/badger/key"
-          - name: COLLECTOR_ZIPKIN_HTTP_PORT
-            value: "9411"
-          - name: MEMORY_MAX_TRACES
-            value: "50000"
-          - name: QUERY_BASE_PATH
-            value:  /api/jaeger 
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 14269
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 14269
-          volumeMounts:
-          - name: data
-            mountPath: /badger
-          resources:
-            requests:
-              cpu: 10m
-              memory: 50Mi
-            limits:
-              cpu: 50m
-              memory: 100Mi
-            
-      affinity:      
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - "amd64"
-                - "ppc64le"
-                - "s390x"
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 2
-            preference:
-              matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - "amd64"
-          - weight: 2
-            preference:
-              matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - "ppc64le"
-          - weight: 2
-            preference:
-              matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - "s390x"      
-      volumes:
-      - name: data
-        emptyDir: {}
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger-query
-  namespace: istio-system
-  annotations:
-  labels:
-    app: jaeger
-    jaeger-infra: jaeger-service
-    release: istio
-spec:
-  ports:
-    - name: query-http
-      port: 16686
-      protocol: TCP
-      targetPort: 16686
-  selector:
-    app: jaeger
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger-collector
-  namespace: istio-system
-  labels:
-    app: jaeger
-    jaeger-infra: collector-service
-    release: istio
-spec:
-  ports:
-  - name: jaeger-collector-tchannel
-    port: 14267
-    protocol: TCP
-    targetPort: 14267
-  - name: jaeger-collector-http
-    port: 14268
-    targetPort: 14268
-    protocol: TCP
-  - name: jaeger-collector-grpc
-    port: 14250
-    targetPort: 14250
-    protocol: TCP
-  selector:
-    app: jaeger
-  type: ClusterIP
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger-collector-headless
-  namespace: istio-system
-  labels:
-    app: jaeger
-    jaeger-infra: collector-service
-    release: istio
-spec:
-  ports:
-  - name: jaeger-collector-grpc
-    port: 14250
-    targetPort: 14250
-    protocol: TCP
-  selector:
-    app: jaeger
-  clusterIP: None
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger-agent
-  namespace: istio-system
-  labels:
-    app: jaeger
-    jaeger-infra: agent-service
-    release: istio
-spec:
-  ports:
-  - name: agent-zipkin-thrift
-    port: 5775
-    protocol: UDP
-    targetPort: 5775
-  - name: agent-compact
-    port: 6831
-    protocol: UDP
-    targetPort: 6831
-  - name: agent-binary
-    port: 6832
-    protocol: UDP
-    targetPort: 6832
-  clusterIP: None
-  selector:
-    app: jaeger
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: zipkin
-  namespace: istio-system
-  labels:
-    app: jaeger
-    release: istio
-spec:
-  ports:
-    - port: 9411
-      targetPort: 9411
-      protocol: TCP
-      name: http-query
-  selector:
-    app: jaeger
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: tracing
-  namespace: istio-system
-  annotations:
-  labels:
-    app: jaeger
-    release: istio
-spec:
-  type: ClusterIP
-  ports:
-    - name: http-query
-      port: 80
-      protocol: TCP
-
-      targetPort: 16686
-
-  selector:
-    app: jaeger
----
+              protocol: TCP
+            readinessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /
+                port: 16687
+                scheme: HTTP
+              initialDelaySeconds: 20
+              periodSeconds: 5
+              successThreshold: 1
+              timeoutSeconds: 4
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /conf
+              name: jaeger-configuration-volume
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name : gatekeeper-files
+            configMap:
+              name: gatekeeper-files
+          - configMap:
+              defaultMode: 420
+              items:
+              - key: query
+                path: query.yaml
+              name: jaeger-configuration
+            name: jaeger-configuration-volume
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+      labels:
+        app: jaeger
+        app.kubernetes.io/component: query
+        app.kubernetes.io/name: jaeger
+      name: jaeger-query
+      namespace: istio-system
+    spec:
+      ports:
+      - name: gatekeeper
+        port: 3000
+      selector:
+        app.kubernetes.io/component: query
+        app.kubernetes.io/name: jaeger
+      type: LoadBalancer
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: gatekeeper-files
+      namespace: istio-system
+      creationTimestamp: null
+    data:
+      access-forbidden.html: |+
+        <html lang="en"><head> <title>Access Forbidden</title><style>*{font-family: "Courier", "Courier New", "sans-serif"; margin:0; padding: 0;}body{background: #233142;}.whistle{width: 20%; fill: #f95959; margin: 100px 40%; text-align: left; transform: translate(-50%, -50%); transform: rotate(0); transform-origin: 80% 30%; animation: wiggle .2s infinite;}@keyframes wiggle{0%{transform: rotate(3deg);}50%{transform: rotate(0deg);}100%{transform: rotate(3deg);}}h1{margin-top: -100px; margin-bottom: 20px; color: #facf5a; text-align: center; font-size: 90px; font-weight: 800;}h2, a{color: #455d7a; text-align: center; font-size: 30px; text-transform: uppercase;}</style> </head><body> <use> <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve" class="whistle"><g><g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)"><path d="M4295.8,3963.2c-113-57.4-122.5-107.2-116.8-622.3l5.7-461.4l63.2-55.5c72.8-65.1,178.1-74.7,250.8-24.9c86.2,61.3,97.6,128.3,97.6,584c0,474.8-11.5,526.5-124.5,580.1C4393.4,4001.5,4372.4,4001.5,4295.8,3963.2z"/><path d="M3053.1,3134.2c-68.9-42.1-111-143.6-93.8-216.4c7.7-26.8,216.4-250.8,476.8-509.3c417.4-417.4,469.1-463.4,526.5-463.4c128.3,0,212.5,88.1,212.5,224c0,67-26.8,97.6-434.6,509.3c-241.2,241.2-459.5,449.9-488.2,465.3C3181.4,3180.1,3124,3178.2,3053.1,3134.2z"/><path d="M2653,1529.7C1644,1445.4,765.1,850,345.8-32.7C62.4-628.2,22.2-1317.4,234.8-1960.8C451.1-2621.3,947-3186.2,1584.6-3500.2c1018.6-501.6,2228.7-296.8,3040.5,515.1c317.8,317.8,561,723.7,670.1,1120.1c101.5,369.5,158.9,455.7,360,553.3c114.9,57.4,170.4,65.1,1487.7,229.8c752.5,93.8,1392,181.9,1420.7,193.4C8628.7-857.9,9900,1250.1,9900,1328.6c0,84.3-67,172.3-147.4,195.3c-51.7,15.3-790.8,19.1-2558,15.3l-2487.2-5.7l-55.5-63.2l-55.5-61.3v-344.6V719.8h-411.7h-411.7v325.5c0,509.3,11.5,499.7-616.5,494C2921,1537.3,2695.1,1533.5,2653,1529.7z"/></g></g></svg></use><h1>403</h1><h2>Not this time, access forbidden!</h2><h2><a href="/oauth/logout?redirect=https://192.168.9.152:3000">Logout</h2></body></html>
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: jaeger-ingress
+      namespace: istio-system
+      labels:
+        app: jaeger
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: query
+        ingress.tmaxcloud.org/name: jaeger-query
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    spec:
+      ingressClassName: tmax-cloud
+      tls:
+      - hosts:
+        - jaeger.{CUSTOM_DOMAIN_NAME}
+      rules:
+        - host: jaeger.{CUSTOM_DOMAIN_NAME}
+          http:
+            paths:
+              - pathType: Prefix
+                path: /
+                backend:
+                  service:
+                    name: jaeger-query
+                    port:
+                      number: 80
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      namespace: istio-system
+      name: jaeger-agent
+      labels:
+        app: jaeger
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: agent
+    spec:
+      selector:
+        matchLabels:
+          app: jaeger
+      template:
+        metadata:
+          labels:
+            app: jaeger
+            app.kubernetes.io/name: jaeger
+            app.kubernetes.io/component: agent
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "5778"
+        spec:
+          containers:
+            - image: docker.io/jaegertracing/jaeger-agent:{JAEGER_VERSION}
+              name: jaeger-agent
+              args: ["--config-file=/conf/agent.yaml"]
+              volumeMounts:
+                - name: jaeger-configuration-volume
+                  mountPath: /conf
+              ports:
+                - containerPort: 5775
+                  protocol: UDP
+                - containerPort: 6831
+                  protocol: UDP
+                - containerPort: 6832
+                  protocol: UDP
+                - containerPort: 5778
+                  protocol: TCP
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+          volumes:
+            - configMap:
+                name: jaeger-configuration
+                items:
+                  - key: agent
+                    path: agent.yaml
+              name: jaeger-configuration-volume

@@ -573,7 +573,6 @@ metadata:
   labels:
     release: istio
 data:
-
   values: |-
     {
       "global": {
@@ -677,7 +676,7 @@ data:
           "excludeIPRanges": "",
           "excludeInboundPorts": "",
           "excludeOutboundPorts": "",
-          "image": "proxyv2",
+          "image": {{ service_mesh_proxyv2_image_repo }}:{{ service_mesh_proxyv2_image_tag }},
           "includeIPRanges": "*",
           "includeInboundPorts": "*",
           "kubevirtInterfaces": "",
@@ -701,7 +700,7 @@ data:
           "tracer": "zipkin"
         },
         "proxy_init": {
-          "image": "proxyv2",
+          "image": {{ service_mesh_proxyv2_image_repo }}:{{ service_mesh_proxyv2_image_tag }},
           "resources": {
             "limits": {
               "cpu": "100m",
@@ -724,7 +723,7 @@ data:
         "sts": {
           "servicePort": 0
         },
-        "tag": "{istio_version}",
+        "tag": "",
         "telemetryNamespace": "istio-system",
         "tracer": {
           "datadog": {
@@ -785,9 +784,9 @@ data:
 
     # Configmap optimized for Istiod. Please DO NOT MERGE all changes from istio - in particular those dependent on
     # Values.yaml, which should not be used by istiod.
-    
+
     # Istiod only uses SDS based config ( files will mapped/handled by SDS).
-    
+    {% raw %}
     template: |
       rewriteAppHTTPProbe: {{ valueOrDefault .Values.sidecarInjectorWebhook.rewriteAppHTTPProbe false }}
       initContainers:
@@ -797,11 +796,7 @@ data:
       {{ else -}}
       - name: istio-init
       {{ end -}}
-      {{- if contains "/" .Values.global.proxy_init.image }}
         image: "{{ .Values.global.proxy_init.image }}"
-      {{- else }}
-        image: "{{ .Values.global.hub }}/{{ .Values.global.proxy_init.image }}:{{ .Values.global.tag }}"
-      {{- end }}
         command:
         - istio-iptables
         - "-p"
@@ -869,11 +864,7 @@ data:
         - sysctl -w kernel.core_pattern=/var/lib/istio/core.proxy && ulimit -c unlimited
         command:
           - /bin/sh
-      {{- if contains "/" .Values.global.proxy_init.image }}
         image: "{{ .Values.global.proxy_init.image }}"
-      {{- else }}
-        image: "{{ .Values.global.hub }}/{{ .Values.global.proxy_init.image }}:{{ .Values.global.tag }}"
-      {{- end }}
         imagePullPolicy: "{{ valueOrDefault .Values.global.imagePullPolicy `Always` }}"
         resources: {}
         securityContext:
@@ -891,11 +882,7 @@ data:
       {{ end }}
       containers:
       - name: istio-proxy
-      {{- if contains "/" (annotation .ObjectMeta `sidecar.istio.io/proxyImage` .Values.global.proxy.image) }}
-        image: "{{ annotation .ObjectMeta `sidecar.istio.io/proxyImage` .Values.global.proxy.image }}"
-      {{- else }}
-        image: "{{ .Values.global.hub }}/{{ .Values.global.proxy.image }}:{{ .Values.global.tag }}"
-      {{- end }}
+        image: "{{ .Values.global.proxy.image }}"
         ports:
         - containerPort: 15090
           protocol: TCP
@@ -1262,9 +1249,9 @@ data:
         traffic.sidecar.istio.io/excludeOutboundPorts: "{{ annotation .ObjectMeta `traffic.sidecar.istio.io/excludeOutboundPorts` .Values.global.proxy.excludeOutboundPorts }}"
       {{- end }}
         traffic.sidecar.istio.io/kubevirtInterfaces: "{{ index .ObjectMeta.Annotations `traffic.sidecar.istio.io/kubevirtInterfaces` }}"
+    {% endraw %}
+
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1369,13 +1356,11 @@ spec:
           value: istiod.istio-system.svc:15012
         - name: PILOT_EXTERNAL_GALLEY
           value: "false"
-#        - name: CLUSTER_ID
-#          value: Kubernetes
         envFrom:
         - configMapRef:
             name: istiod
             optional: true
-        image: docker.io/istio/pilot:{istio_version}
+        image: docker.io/istio/pilot:{ISTIO_VERSION}
         imagePullPolicy: IfNotPresent
         name: discovery
         ports:
@@ -1407,9 +1392,6 @@ spec:
         volumeMounts:
         - mountPath: /etc/istio/config
           name: config-volume
-#        - mountPath: /var/run/secrets/tokens
-#          name: istio-token
-#          readOnly: true
         - mountPath: /var/run/secrets/istio-dns
           name: local-certs
         - mountPath: /etc/cacerts
@@ -1428,13 +1410,6 @@ spec:
       - emptyDir:
           medium: Memory
         name: local-certs
-#      - name: istio-token
-#        projected:
-#          sources:
-#          - serviceAccountToken:
-#              audience: istio-ca
-#              expirationSeconds: 43200
-#              path: istio-token
       - configMap:
           name: istiod
           optional: true
@@ -2059,4 +2034,3 @@ metadata:
     istio: galley
 webhooks:
 ---
-
