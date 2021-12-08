@@ -39,10 +39,10 @@
 
 ## Step0. 폐쇄망 설정
   * `폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다.`
-	
+
 	```bash
   $ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing.yaml
-  
+
 	$ sed -i 's/docker.io\/jaegertracing\/jager-query/'${REGISTRY}'\/jaegertracing\/jaeger-query/g' 2.istio-tracing.yaml
 	$ sed -i 's/docker.io\/jaegertracing\/jaeger-collector/'${REGISTRY}'\/jaegertracing\/jaeger-collector/g' 2.istio-tracing.yaml
 	$ sed -i 's/docker.io\/istio/'${REGISTRY}'\/istio/g' 3.istio-core.yaml
@@ -51,14 +51,30 @@
 	```
 
 ## Step 1. hyperauth API-GATEWAY 연동
+[가이드 링크](https://github.com/tmax-cloud/hyperauth/blob/main/guide/keycloak-gatekeeper/keycloak-gatekeeper.pptx)
+
 1. 클라이언트 생성
+  - Client-Protocol : openid-connect
+  - Access Type : confidential
+
 ![image](figure/keycloak1.png)
+
 2. 클라이언트 role (manager) 생성
+
+- role를 가진 사용자만 client에 등록된 서비스에 로그인할 수 있다
+
 ![image](figure/keycloak2.png)
-3. 관리자계정에 manager role 추가 (관리자 계정 / role mappings / client roles : jaeger 에서 생성한 role 을 부여한다)
-   ![image](figure/keycloak3.png)
-4. 클라이언트- mapper 생성(Access Token Audience에 포함시키기 위함)
-   ![image](figure/keycloak4.png)
+
+3. 관리자계정에 manager role 등록
+   - 관리자 계정(admin) - role mappings - client roles: jaeger 선택
+
+![image](figure/keycloak3.png)
+
+4. 클라이언트- mapper 생성
+   - Access Token Audience에 포함시키기 위함
+
+![image](figure/keycloak4.png)
+
 ---
 
 ## Step 1. 버전 수정
