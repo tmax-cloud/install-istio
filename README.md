@@ -36,21 +36,25 @@
 
 ## Install Steps
 
+---
 
 ## Step0. 폐쇄망 설정
-  * `폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다.`
 
-	```bash
-  $ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing.yaml
-	
-	$ sed -i 's/docker.io\/jaegertracing\/jager-query/'${REGISTRY}'\/jaegertracing\/jaeger-query/g' 2.istio-tracing.yaml
-	$ sed -i 's/docker.io\/jaegertracing\/jaeger-collector/'${REGISTRY}'\/jaegertracing\/jaeger-collector/g' 2.istio-tracing.yaml
-	$ sed -i 's/docker.io\/istio/'${REGISTRY}'\/istio/g' 3.istio-core.yaml
-	$ sed -i 's/docker.io\/istio\/proxyv2/'${REGISTRY}'\/istio\/proxyv2/g' 4.istio-ingressgateway.yaml
-	$ sed -i 's/docker.io/'${REGISTRY}'/g' bookinfo.yaml
-	```
+  * 폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다.
+
+```bash
+$ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing.yaml
+$ sed -i 's/docker.io\/jaegertracing\/jager-query/'${REGISTRY}'\/jaegertracing\/jaeger-query/g' 2.istio-tracing.yaml
+$ sed -i 's/docker.io\/jaegertracing\/jaeger-collector/'${REGISTRY}'\/jaegertracing\/jaeger-collector/g' 2.istio-tracing.yaml
+$ sed -i 's/docker.io\/istio/'${REGISTRY}'\/istio/g' 3.istio-core.yaml
+$ sed -i 's/docker.io\/istio\/proxyv2/'${REGISTRY}'\/istio\/proxyv2/g' 4.istio-ingressgateway.yaml
+$ sed -i 's/docker.io/'${REGISTRY}'/g' bookinfo.yaml
+```
+
+---
 
 ## Step 1. hyperauth API-GATEWAY 연동
+
 [가이드 링크](https://github.com/tmax-cloud/hyperauth/blob/main/guide/keycloak-gatekeeper/keycloak-gatekeeper.pptx)
 
 1. 클라이언트 생성
