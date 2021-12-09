@@ -724,7 +724,7 @@ data:
         "sts": {
           "servicePort": 0
         },
-        "tag": "{istio_version}",
+        "tag": "{ISTIO_VERSION}",
         "telemetryNamespace": "istio-system",
         "tracer": {
           "datadog": {
@@ -1375,7 +1375,7 @@ spec:
         - configMapRef:
             name: istiod
             optional: true
-        image: docker.io/istio/pilot:{istio_version}
+        image: docker.io/istio/pilot:{ISTIO_VERSION}
         imagePullPolicy: IfNotPresent
         name: discovery
         ports:

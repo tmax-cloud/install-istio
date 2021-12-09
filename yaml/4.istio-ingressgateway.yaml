@@ -195,7 +195,7 @@ spec:
           value: sni-dnat
         - name: ISTIO_META_CLUSTER_ID
           value: Kubernetes
-        image: docker.io/istio/proxyv2:{istio_version}
+        image: docker.io/istio/proxyv2:{ISTIO_VERSION}
         imagePullPolicy: IfNotPresent
         name: istio-proxy
         ports:
