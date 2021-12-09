@@ -15,6 +15,7 @@ sed -i 's|{KEYCLOAK_ADDR}|'${KEYCLOAK_ADDR}'|g' 2.istio-tracing.yaml
 sed -i 's|{REDIRECT_URL}|'${REDIRECT_URL}'|g' 2.istio-tracing.yaml
 sed -i 's/{CUSTOM_DOMAIN_NAME}/'${CUSTOM_DOMAIN_NAME}'/g' 4.istio-ingressgateway.yaml
 sed -i 's/{CUSTOM_DOMAIN_NAME}/'${CUSTOM_DOMAIN_NAME}'/g' 2.istio-tracing.yaml
+kubectl create -f jaeger-gatekeeper-forbidden-cm.yaml
 kubectl create -f 1.istio-base.yaml
 kubectl create -f 2.istio-tracing.yaml
 kubectl create -f 3.istio-core.yaml
