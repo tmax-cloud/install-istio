@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: envoy-stats
-  namespace: istio-system
+  namespace: monitoring
 spec:
   jobLabel: envoy-stats
   namespaceSelector:

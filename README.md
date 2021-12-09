@@ -82,6 +82,8 @@
 * 목적 : `설치 위한 정보 기입`
 * 순서 : 알맞은 config 내용 작성 [(version.conf)](./version.conf)
   - CLIENT_ID,CLIENT_SECRET,CLIENT_ROLE은 hyperauth에서 생성한 값을 이용한다
+  - [jaeger-gatekeeper-forbidden-cm.yaml](yaml/jaeger-gatekeeper-forbidden-cm.yaml)은 로그인 실패시 나타는 화면이다.
+    - html 마지막 logout A 태그 redirect 주소를 실제 노출 주소로 변경 해주어야한다
 
 ---
 
