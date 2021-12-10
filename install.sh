@@ -13,6 +13,7 @@ sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' 2.istio-tracing.yaml
 sed -i 's/{CLIENT_ROLE}/'${CLIENT_ROLE}'/g' 2.istio-tracing.yaml
 sed -i 's|{KEYCLOAK_ADDR}|'${KEYCLOAK_ADDR}'|g' 2.istio-tracing.yaml
 sed -i 's|{REDIRECT_URL}|'${REDIRECT_URL}'|g' jaeger-gatekeeper-forbidden-cm.yaml
+sed -i 's/{ISTIO_VERSION}/'${ISTIO_VERSION}'/g' 4.istio-ingressgateway.yaml
 sed -i 's/{CUSTOM_DOMAIN_NAME}/'${CUSTOM_DOMAIN_NAME}'/g' 4.istio-ingressgateway.yaml
 sed -i 's/{CUSTOM_DOMAIN_NAME}/'${CUSTOM_DOMAIN_NAME}'/g' 2.istio-tracing.yaml
 

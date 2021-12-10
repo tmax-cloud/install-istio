@@ -298,11 +298,6 @@ metadata:
   namespace: istio-system
 spec:
   ports:
-  - name: jaeger-query
-    nodePort: 31589
-    port: 80
-    protocol: TCP
-    targetPort: 16686
   - name: gatekeeper
     port: 3000
   selector:
@@ -363,6 +358,7 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "5778"
     spec:
+      serviceAccountName: jaeger-service-account
       containers:
         - image: docker.io/jaegertracing/jaeger-agent:{JAEGER_VERSION}
           name: jaeger-agent
