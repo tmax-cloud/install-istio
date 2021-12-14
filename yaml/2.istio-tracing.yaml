@@ -319,7 +319,7 @@ metadata:
     app: jaeger
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: query
-    ingress.tmaxcloud.org/name: jaeger-query
+    ingress.tmaxcloud.org/name: jaeger
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: api-gateway-system-traefik-forward-auth@kubernetescrd
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
