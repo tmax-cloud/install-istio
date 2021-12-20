@@ -302,16 +302,13 @@ metadata:
 spec:
   ports:
   - name: jaeger-query
-    nodePort: 31589
-    port: 80
+    port: 443
     protocol: TCP
-    targetPort: 16686
-  - name: gatekeeper
-    port: 3000
+    targetPort: 3000
   selector:
     app.kubernetes.io/component: query
     app.kubernetes.io/name: jaeger
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -340,7 +337,7 @@ spec:
               service:
                 name: jaeger-query
                 port:
-                  number: 80
+                  number: 443
 ---
 apiVersion: apps/v1
 kind: DaemonSet
