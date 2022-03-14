@@ -423,6 +423,9 @@ spec:
           volumeMounts:
             - name: jaeger-configuration-volume
               mountPath: /conf
+            - name: jaeger-service-token
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
           ports:
             - containerPort: 5775
               protocol: UDP
