@@ -271,7 +271,7 @@ spec:
             configMapKeyRef:
               key: span-storage-type
               name: jaeger-configuration
-        - name: QUERY_BASE_PATH
+        - name: BASE_QUERY_PATH
           value: /api/jaeger
         image: docker.io/jaegertracing/jaeger-query:{JAEGER_VERSION}
         imagePullPolicy: IfNotPresent
