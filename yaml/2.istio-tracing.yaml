@@ -240,19 +240,19 @@ spec:
         - --discovery-url=https://{GATEKEEPER_ADDR}/auth/realms/tmax
         - --secure-cookie=true
         - --skip-openid-provider-tls-verify=true
-        - --enable-self-signed-tls=false,
-        - --tls-cert=/etc/secrets/tls.crt,
-        - --tls-private-key=/etc/secrets/tls.key,
-        - --tls-ca-certificate=/etc/secrets/ca.crt,
-        - --skip-upstream-tls-verify=true,
-        - --upstream-keepalives=false,
-        - --enable-default-deny=true,
-        - --enable-refresh-tokens=true,
-        - --enable-metrics=true,
-        - --encryption-key=AgXa7xRcoClDEU0ZDSH4X0XhL5Qy2Z2j,
-        - --forbidden-page=/html/access-forbidden.html,
-        - --resources=uri=/*|roles=jaeger:jaeger-manager,
-        - --enable-encrypted-token,
+        - --enable-self-signed-tls=false
+        - --tls-cert=/etc/secrets/tls.crt
+        - --tls-private-key=/etc/secrets/tls.key
+        - --tls-ca-certificate=/etc/secrets/ca.crt
+        - --skip-upstream-tls-verify=true
+        - --upstream-keepalives=false
+        - --enable-default-deny=true
+        - --enable-refresh-tokens=true
+        - --enable-metrics=true
+        - --encryption-key=AgXa7xRcoClDEU0ZDSH4X0XhL5Qy2Z2j
+        - --forbidden-page=/html/access-forbidden.html
+        - --resources=uri=/*|roles=jaeger:jaeger-manager
+        - --enable-encrypted-token
         - --verbose
         ports:
         - containerPort: 3000
@@ -271,7 +271,7 @@ spec:
             configMapKeyRef:
               key: span-storage-type
               name: jaeger-configuration
-        - name: QUERY_BASE_PATH
+        - name: BASE_QUERY_PATH
           value: /api/jaeger
         image: docker.io/jaegertracing/jaeger-query:{JAEGER_VERSION}
         imagePullPolicy: IfNotPresent
@@ -423,6 +423,9 @@ spec:
           volumeMounts:
             - name: jaeger-configuration-volume
               mountPath: /conf
+            - name: jaeger-service-token
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
           ports:
             - containerPort: 5775
               protocol: UDP
