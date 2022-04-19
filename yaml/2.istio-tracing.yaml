@@ -64,13 +64,14 @@ data:
       server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
     collector:
       zipkin:
-        http-port: 9411
+        host-port: 9411
   query: |
     es:
       server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
   agent: |
-    collector:
-      host-port: "jaeger-collector:14267"
+    reporter:
+      grpc:
+        host-port: "jaeger-collector:14250"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -104,7 +105,7 @@ spec:
           name: jaeger-collector
           args: ["--config-file=/conf/collector.yaml"]
           ports:
-            - containerPort: 14267
+            - containerPort: 14250
               protocol: TCP
             - containerPort: 14268
               protocol: TCP
@@ -112,7 +113,7 @@ spec:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: "/"
+              path: /
               port: 14269
           volumeMounts:
             - name: jaeger-configuration-volume
@@ -149,10 +150,10 @@ metadata:
     app.kubernetes.io/component: collector
 spec:
   ports:
-    - name: jaeger-collector-tchannel
-      port: 14267
+    - name: jaeger-collector-grpc
+      port: 14250
       protocol: TCP
-      targetPort: 14267
+      targetPort: 14250
     - name: jaeger-collector-http
       port: 14268
       protocol: TCP
@@ -422,6 +423,12 @@ spec:
               protocol: UDP
             - containerPort: 5778
               protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 14271
+              scheme: HTTP              
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       volumes:
