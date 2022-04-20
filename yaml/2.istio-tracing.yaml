@@ -344,8 +344,8 @@ spec:
     - "tmax-cloud"
     - "jaeger-query.istio-system.svc"
   issuerRef:
-    kind: ClusterIssuer,
-    group: cert-manager.io,
+    kind: ClusterIssuer
+    group: cert-manager.io
     name: tmaxcloud-issuer
 ---
 apiVersion: networking.k8s.io/v1
