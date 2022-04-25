@@ -4,9 +4,9 @@
 ## 구성 요소 및 버전
 * istiod ([docker.io/istio/pilot:1.5.1](https://hub.docker.com/layers/istio/pilot/1.5.1/images/sha256-818aecc1c73c53af9091ac1d4f500d9d7cec6d135d372d03cffab1addaff4ec0?context=explore))
 * istio-ingressgateway ([docker.io/istio/proxyv2:1.5.1](https://hub.docker.com/layers/istio/proxyv2/1.5.1/images/sha256-3ad9ee2b43b299e5e6d97aaea5ed47dbf3da9293733607d9b52f358313e852ae?context=explore))
-* jaeger-agent[(docker.io/jaegertracing/jager-agent:1.27)](https://hub.docker.com/layers/jaegertracing/jaeger-agent/1.9/images/sha256-f214f1a411a2bbfab2fadd305f28fa2866aaf36d1ac3260901ebf5b58dae3c0e?context=explore)
-* jaeger-query[(docker.io/jaegertracing/jager-queryt:1.27)](https://hub.docker.com/layers/jaegertracing/jaeger-query/1.9/images/sha256-0ca742b990db6e716171cb966225414fb382e96af4ddd0e8b5cca18e832ca36c?context=explore)
-* jaeger-collector[(docker.io/jaegertracing/jager-collector:1.27)](https://hub.docker.com/layers/jaegertracing/jaeger-collector/1.9/images/sha256-17339bf58eced9c025b433219dbe0875d42b67c9b36d6a6b0e8b0fbb03adfdfe?context=explore)
+* jaeger-agent[(docker.io/jaegertracing/jaeger-agent:1.27)](https://hub.docker.com/layers/jaeger-agent/jaegertracing/jaeger-agent/1.27/images/sha256-6f615305dc10d76ea6823ba55a0061112da6d08b31c863cedce2e1ac19528a2c?context=explore)
+* jaeger-query[(docker.io/jaegertracing/jaeger-query:1.27)](https://hub.docker.com/layers/jaeger-query/jaegertracing/jaeger-query/1.27/images/sha256-01a8eadb5cebb7e1db3db697148a987a666a69c3cce936686fcf3f0b979fe47e?context=explore)
+* jaeger-collector[(docker.io/jaegertracing/jaeger-collector:1.27)](https://hub.docker.com/layers/jaeger-collector/jaegertracing/jaeger-collector/1.27/images/sha256-8d18ad8b616b843e79cf484a4c9307c8a62347ade531ca29ad1bad9055fa1e07?context=explore)
 
 * bookinfo example
     * productpage([docker.io/istio/examples-bookinfo-productpage-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-productpage-v1/1.15.0/images/sha256-0a5eb4795952372251d51f72834bccb7ea01a67cb72fd9b58b757cca103b7524?context=explore))
