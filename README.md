@@ -1,7 +1,13 @@
 
 # Istio 설치 가이드
 
+## 개요
+
+- Istio는 MSA 구축을 위해 마이크로 서비스 간 데이터 공유를 제어하는 Service Mesh 솔루션이다.
+- Service Discovery, Load Balancing, Canary Rollout, Circuit Breaking 등 트래픽을 관리, Service간에 mTLS 제공 및 Jaeger와 Kiali로 tracing과 Monitoring한다.
+
 ## 구성 요소 및 버전
+
 * istiod ([docker.io/istio/pilot:1.5.1](https://hub.docker.com/layers/istio/pilot/1.5.1/images/sha256-818aecc1c73c53af9091ac1d4f500d9d7cec6d135d372d03cffab1addaff4ec0?context=explore))
 * istio-ingressgateway ([docker.io/istio/proxyv2:1.5.1](https://hub.docker.com/layers/istio/proxyv2/1.5.1/images/sha256-3ad9ee2b43b299e5e6d97aaea5ed47dbf3da9293733607d9b52f358313e852ae?context=explore))
 * jaeger-agent[(docker.io/jaegertracing/jaeger-agent:1.27)](https://hub.docker.com/layers/jaeger-agent/jaegertracing/jaeger-agent/1.27/images/sha256-6f615305dc10d76ea6823ba55a0061112da6d08b31c863cedce2e1ac19528a2c?context=explore)
