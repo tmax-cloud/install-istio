@@ -58,7 +58,7 @@ metadata:
     app: jaeger
     app.kubernetes.io/name: jaeger
 data:
-  span-storage-type: elasticsearch
+  span-storage-type: {EFK_ES_SVC_NAME}
   collector: |
     es:
       server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
