@@ -11,11 +11,11 @@ cp "$install_dir/yaml/4.istio-ingressgateway.yaml" "$install_dir/yaml/4.istio-in
 cp "$install_dir/yaml/5.istio-metric.yaml" "$install_dir/yaml/5.istio-metric-modified.yaml"
 
 if [ $STORAGE_NAME == "elasticsearch" ] ; then
-    cp "$install_dir/yaml/2-1.istio-tracing-es.yaml" "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
+    cp "$install_dir/yaml/2-1.istio-tracing-es.yaml" "$install_dir/yaml/2.istio-tracing-modified.yaml"
 else
-    cp "$install_dir/yaml/2-2.istio-tracing-os.yaml" "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
-    sed -i 's/{OPENSEARCH_UNAME}/'${OPENSEARCH_UNAME}'/g' "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
-    sed -i 's/{OPENSEARCH_UPWD}/'${OPENSEARCH_UPWD}'/g' "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
+    cp "$install_dir/yaml/2-2.istio-tracing-os.yaml" "$install_dir/yaml/2.istio-tracing-modified.yaml"
+    sed -i 's/{OPENSEARCH_UNAME}/'${OPENSEARCH_UNAME}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
+    sed -i 's/{OPENSEARCH_UPWD}/'${OPENSEARCH_UPWD}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 fi
 
 
