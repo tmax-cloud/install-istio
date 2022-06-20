@@ -30,17 +30,16 @@
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. **폐쇄망에서 설치하는 경우** 사용하는 image repository에 istio 설치 시 필요한 이미지를 push한다.
-    
+   
     - [install-registry 이미지 푸시하기 참조](https://github.com/tmax-cloud/install-registry/blob/5.0/podman.md)  
+    
 2. install yaml을 다운로드한다.
+    
+    => 2.istio-tracing-es.yaml 예시
+    
     ```bash
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/1.istio-base.yaml
-    
-    # 1) elasticsearch
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/2.istio-tracing-es.yaml
-    # 2) opensearch
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/2.istio-tracing-os.yaml
-    
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/3.istio-core.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/4.istio-ingressgateway.yaml
     $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/5.istio-metric.yaml
@@ -53,7 +52,9 @@
 
 ## Step0. 폐쇄망 설정
 
-  * 폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다. (2.istio-tracing-es.yaml 예시)
+  * 폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다. 
+
+    => 2.istio-tracing-es.yaml 예시
 
 ```bash
 $ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing-es.yaml
