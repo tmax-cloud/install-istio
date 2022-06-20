@@ -6,18 +6,24 @@ source version.conf
 cp "$install_dir/yaml/instance.yaml" "$install_dir/yaml/instance_modified.yaml"
 cp "$install_dir/yaml/1.istio-base.yaml" "$install_dir/yaml/1.istio-base-modified.yaml"
 cp "$install_dir/yaml/jaeger-gatekeeper-forbidden-cm.yaml" "$install_dir/yaml/jaeger-gatekeeper-forbidden-cm-modified.yaml"
-cp "$install_dir/yaml/2.istio-tracing.yaml" "$install_dir/yaml/2.istio-tracing-modified.yaml"
 cp "$install_dir/yaml/3.istio-core.yaml" "$install_dir/yaml/3.istio-core-modified.yaml"
 cp "$install_dir/yaml/4.istio-ingressgateway.yaml" "$install_dir/yaml/4.istio-ingressgateway-modified.yaml"
 cp "$install_dir/yaml/5.istio-metric.yaml" "$install_dir/yaml/5.istio-metric-modified.yaml"
 
+if [ $STORAGE_NAME == "elasticsearch" ] ; then
+    cp "$install_dir/yaml/2-1.istio-tracing-es.yaml" "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
+else
+    cp "$install_dir/yaml/2-2.istio-tracing-os.yaml" "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
+    sed -i 's/{OPENSEARCH_UNAME}/'${OPENSEARCH_UNAME}'/g' "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
+    sed -i 's/{OPENSEARCH_UPWD}/'${OPENSEARCH_UPWD}'/g' "$install_dir/yaml-modified/2.istio-tracing-modified.yaml"
+fi
 
 
 sed -i 's/{CUSTOM_DOMAIN_NAME}/'${CUSTOM_DOMAIN_NAME}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's/{JAEGER_VERSION}/'${JAEGER_VERSION}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's/{GATEKEEPER_VERSION}/'${GATEKEEPER_VERSION}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
-sed -i 's/{EFK_ES_SVC_NAME}/'${EFK_ES_SVC_NAME}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
-sed -i 's/{EFK_NAMESPACE}/'${EFK_NAMESPACE}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
+sed -i 's/{STORAGE_NAME}/'${STORAGE_NAME}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
+sed -i 's/{STORAGE_NAMESPACE}/'${STORAGE_NAMESPACE}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's/{CLIENT_ID}/'${CLIENT_ID}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's/{CLIENT_ROLE}/'${CLIENT_ROLE}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"

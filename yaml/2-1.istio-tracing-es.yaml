@@ -1,4 +1,12 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jaeger-service-account
+  namespace: istio-system
+  labels:
+    app: jaeger
+---
+apiVersion: v1
 kind: Secret
 metadata:
     name: jaeger-service-token
@@ -6,14 +14,6 @@ metadata:
     annotations:
         kubernetes.io/service-account.name: jaeger-service-account
 type: kubernetes.io/service-account-token
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: jaeger-service-account
-  namespace: istio-system
-  labels:
-    app: jaeger
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -35,7 +35,6 @@ rules:
     resources: ["daemonsets"]
     verbs: ["get", "list", "watch", "create", "delete", "update"]
 ---
-
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -58,20 +57,40 @@ metadata:
     app: jaeger
     app.kubernetes.io/name: jaeger
 data:
-  span-storage-type: {EFK_ES_SVC_NAME}
+  span-storage-type: {STORAGE_NAME}
   collector: |
     es:
-      server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
+      server-urls: http://{STORAGE_NAME}.{STORAGE_NAMESPACE}.svc:9200
     collector:
       zipkin:
         host-port: 9411
   query: |
     es:
-      server-urls: http://{EFK_ES_SVC_NAME}.{EFK_NAMESPACE}.svc.cluster.local:9200
+      server-urls: http://{STORAGE_NAME}.{STORAGE_NAMESPACE}.svc:9200
   agent: |
     reporter:
       grpc:
         host-port: "jaeger-collector:14250"
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jaeger-cert
+  namespace: istio-system
+spec:
+  secretName: jaeger-secret
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+    - client auth
+  dnsNames:
+    - "tmax-cloud"
+    - "jaeger-query.istio-system.svc"
+  issuerRef:
+    kind: ClusterIssuer
+    group: cert-manager.io
+    name: tmaxcloud-issuer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -110,6 +129,8 @@ spec:
             - containerPort: 14268
               protocol: TCP
             - containerPort: 9411
+              protocol: TCP
+            - containerPort: 14269
               protocol: TCP
           readinessProbe:
             httpGet:
@@ -251,7 +272,10 @@ spec:
         - name: secret
           mountPath: /etc/secrets
           readOnly: true
-      - args:
+      - name: jaeger-query
+        image: docker.io/jaegertracing/jaeger-query:{JAEGER_VERSION}
+        imagePullPolicy: IfNotPresent
+        args:
         - --config-file=/conf/query.yaml
         env:
         - name: SPAN_STORAGE_TYPE
@@ -261,11 +285,10 @@ spec:
               name: jaeger-configuration
         - name: BASE_QUERY_PATH
           value: /api/jaeger
-        image: docker.io/jaegertracing/jaeger-query:{JAEGER_VERSION}
-        imagePullPolicy: IfNotPresent
-        name: jaeger-query
         ports:
         - containerPort: 16686
+          protocol: TCP
+        - containerPort: 16687
           protocol: TCP
         readinessProbe:
           failureThreshold: 3
@@ -327,26 +350,6 @@ spec:
     app.kubernetes.io/component: query
     app.kubernetes.io/name: jaeger
   type: ClusterIP
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: jaeger-cert
-  namespace: istio-system
-spec:
-  secretName: jaeger-secret
-  usages:
-    - digital signature
-    - key encipherment
-    - server auth
-    - client auth
-  dnsNames:
-    - "tmax-cloud"
-    - "jaeger-query.istio-system.svc"
-  issuerRef:
-    kind: ClusterIssuer
-    group: cert-manager.io
-    name: tmaxcloud-issuer
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -422,6 +425,8 @@ spec:
             - containerPort: 6832
               protocol: UDP
             - containerPort: 5778
+              protocol: TCP
+            - containerPort: 14271
               protocol: TCP
           readinessProbe:
             failureThreshold: 3
