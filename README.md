@@ -125,6 +125,18 @@ $ sudo chmod +x install.sh
 $ ./install.sh
 ```
 
+
+
+### Uninstaller 가이드
+
+- 목적: `삭제를 위한 쉘 스크립트 실행`
+- 순서: 권한 부여 및 스크립트 실행
+
+```bash
+$ sudo chmod +x uninstall.sh
+$ ./uninstall.sh
+```
+
 ---
 
 
