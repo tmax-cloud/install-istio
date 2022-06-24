@@ -29,14 +29,50 @@ sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' "$install_dir/yaml/2.istio-traci
 sed -i 's/{CLIENT_ROLE}/'${CLIENT_ROLE}'/g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's|{GATEKEEPER_ADDR}|'${GATEKEEPER_ADDR}'|g' "$install_dir/yaml/2.istio-tracing-modified.yaml"
 sed -i 's|{REDIRECT_URL}|'${REDIRECT_URL}'|g' "$install_dir/yaml/jaeger-gatekeeper-forbidden-cm-modified.yaml"
-
 sed -i 's/{ISTIO_VERSION}/'${ISTIO_VERSION}'/g' "$install_dir/yaml/3.istio-core-modified.yaml"
 sed -i 's/{ISTIO_VERSION}/'${ISTIO_VERSION}'/g' "$install_dir/yaml/4.istio-ingressgateway-modified.yaml"
 
-echo -e "\n---------- Start Installation ----------"
-kubectl apply -f "$install_dir/yaml/1.istio-base-modified.yaml"
-kubectl apply -f "$install_dir/yaml/jaeger-gatekeeper-forbidden-cm-modified.yaml"
-kubectl apply -f "$install_dir/yaml/2.istio-tracing-modified.yaml"
-kubectl apply -f "$install_dir/yaml/3.istio-core-modified.yaml"
-kubectl apply -f "$install_dir/yaml/4.istio-ingressgateway-modified.yaml"
-kubectl apply -f "$install_dir/yaml/5.istio-metric-modified.yaml"
+echo -e "\n---------- Start Uninstallation ----------"
+timeout 3m kubectl delete -f "$install_dir/yaml/5.istio-metric-modified.yaml"
+val=`echo $?`
+if [[ $val != 0 ]]; then
+    echo -e "\n---------- 1. istio-metric delete failed ----------"
+    #exit 1
+fi
+
+timeout 3m kubectl delete -f "$install_dir/yaml/4.istio-ingressgateway-modified.yaml"
+val=`echo $?`
+if [[ $val != 0 ]]; then
+    echo -e "\n---------- 2. istio-ingressgateway delete failed ----------"
+    #exit 1
+fi
+
+timeout 3m kubectl delete -f "$install_dir/yaml/3.istio-core-modified.yaml"
+val=`echo $?`
+if [[ $val != 0 ]]; then
+    echo -e "\n---------- 3. istiod delete failed ----------"
+    #exit 1
+fi
+
+timeout 3m kubectl delete -f "$install_dir/yaml/jaeger-gatekeeper-forbidden-cm-modified.yaml"
+val=`echo $?`
+if [[ $val != 0 ]]; then
+    echo -e "\n---------- 4. jaeger-gatekeeper-cm delete failed ----------"
+    #exit 1
+fi
+
+timeout 3m kubectl delete -f "$install_dir/yaml/2.istio-tracing-modified.yaml"
+val=`echo $?`
+if [[ $val != 0 ]]; then
+    echo -e "\n---------- 5. jaeger delete failed ----------"
+    #exit 1
+fi
+
+timeout 3m kubectl delete -f "$install_dir/yaml/1.istio-base-modified.yaml"
+val=`echo $?`
+if [[ $val != 0 ]]; then
+    echo -e "\n---------- 6. istio-base delete failed ----------"
+    #exit 1
+fi
+
+echo -e "\n---------- Complete Uninstallation ----------"
