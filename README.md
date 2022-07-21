@@ -187,6 +187,7 @@ $ ./uninstall.sh
 2. istio-core.yaml
    - istiod
      - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]` 로 설정, default: info
+   
 3. istio-ingressgateway.yaml
    - ingressgateway
      - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]`로 설정 , default:info
@@ -195,8 +196,10 @@ $ ./uninstall.sh
 
    - istio-proxy Container
 
-     - istio-sidecar-injector Configmap에 proxy.loglevel= [info/warning/error/debug]로 설정, default: warning
+     - istio-sidecar-injector Configmap에 `proxy.loglevel= [info/warning/error/debug]`로 설정, default: warning
 
+     - Configmap 수정 시, 기동중인 Pod 재기동 필요
+     
        
 
 
