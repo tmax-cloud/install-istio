@@ -136,7 +136,9 @@ spec:
       containers:
         - image: docker.io/jaegertracing/jaeger-collector:{JAEGER_VERSION}
           name: jaeger-collector
-          args: ["--config-file=/conf/collector.yaml"]
+          args:
+          - --config-file=/conf/collector.yaml
+          - --log-level=info
           ports:
             - containerPort: 14250
               protocol: TCP
@@ -283,7 +285,7 @@ spec:
         - --forbidden-page=/html/access-forbidden.html
         - --resources=uri=/*|roles=jaeger:jaeger-manager
         - --enable-encrypted-token
-        - --verbose
+        - --log-level=error
         ports:
         - containerPort: 3000
           name: gatekeeper
@@ -296,7 +298,9 @@ spec:
       - name: jaeger-query
         image: docker.io/jaegertracing/jaeger-query:{JAEGER_VERSION}
         imagePullPolicy: IfNotPresent
-        args: [ "--config-file=/conf/query.yaml" ]
+        args:
+        - --config-file=/conf/query.yaml
+        - --log-level=info
         env:
         - name: SPAN_STORAGE_TYPE
           valueFrom:
@@ -433,7 +437,9 @@ spec:
       containers:
         - image: docker.io/jaegertracing/jaeger-agent:{JAEGER_VERSION}
           name: jaeger-agent
-          args: ["--config-file=/conf/agent.yaml"]
+          args:
+          - --config-file=/conf/agent.yaml
+          - --log-level=info
           volumeMounts:
             - name: jaeger-configuration-volume
               mountPath: /conf

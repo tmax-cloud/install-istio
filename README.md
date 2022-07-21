@@ -12,8 +12,9 @@
 * istio-ingressgateway ([docker.io/istio/proxyv2:1.5.1](https://hub.docker.com/layers/istio/proxyv2/1.5.1/images/sha256-3ad9ee2b43b299e5e6d97aaea5ed47dbf3da9293733607d9b52f358313e852ae?context=explore))
 * jaeger-agent[(docker.io/jaegertracing/jaeger-agent:1.27)](https://hub.docker.com/layers/jaeger-agent/jaegertracing/jaeger-agent/1.27/images/sha256-6f615305dc10d76ea6823ba55a0061112da6d08b31c863cedce2e1ac19528a2c?context=explore)
 * jaeger-query[(docker.io/jaegertracing/jaeger-query:1.27)](https://hub.docker.com/layers/jaeger-query/jaegertracing/jaeger-query/1.27/images/sha256-01a8eadb5cebb7e1db3db697148a987a666a69c3cce936686fcf3f0b979fe47e?context=explore)
-* jaeger-collector[(docker.io/jaegertracing/jaeger-collector:1.27)](https://hub.docker.com/layers/jaeger-collector/jaegertracing/jaeger-collector/1.27/images/sha256-8d18ad8b616b843e79cf484a4c9307c8a62347ade531ca29ad1bad9055fa1e07?context=explore)
+    * gatekeeper([docker.io/tmaxcloudck/gatekeeper:v1.0.2](https://hub.docker.com/layers/gatekeeper/tmaxcloudck/gatekeeper/v1.0.2/images/sha256-a9152f8e4ef0de9a27ce8471a6f7d46f86d42ae238cbd7e568ea7b480dbd200a?context=explore))
 
+* jaeger-collector[(docker.io/jaegertracing/jaeger-collector:1.27)](https://hub.docker.com/layers/jaeger-collector/jaegertracing/jaeger-collector/1.27/images/sha256-8d18ad8b616b843e79cf484a4c9307c8a62347ade531ca29ad1bad9055fa1e07?context=explore)
 * bookinfo example
     * productpage([docker.io/istio/examples-bookinfo-productpage-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-productpage-v1/1.15.0/images/sha256-0a5eb4795952372251d51f72834bccb7ea01a67cb72fd9b58b757cca103b7524?context=explore))
     * details([docker.io/istio/examples-bookinfo-details-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-details-v1/1.15.0/images/sha256-fce0bcbff0bed09116dacffca15695cd345e0c3788c15b0114a05f654ddecc17?context=explore))
@@ -169,3 +170,32 @@ $ ./uninstall.sh
     ```bash
     $ ./root-transition.sh root-transition
     ```
+
+
+
+## Log level 설정 가이드
+
+1. istio-tracing-xx.yaml
+   - jaeger-agent
+     - Daemonset의 args에 `--log-level=[debug/info/warn/error]` , default: info
+   - jaeger-query
+     - jaeger-query: Deployment의 args에 `--log-level=[debug/info/warn/error]`, default: info
+     - gatekeeper: Deployment의 args에 `--log-level=[debug/info/warning/error/fatal/panic]` , default: info
+   - jaeger-collector
+     - Deployment의 args에 `--log-level=[debug/info/warn/error]` , default: info
+
+2. istio-core.yaml
+   - istiod
+     - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]` 로 설정, default: info
+3. istio-ingressgateway.yaml
+   - ingressgateway
+     - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]`로 설정 , default:info
+
+
+
+
+
+
+
+
+
