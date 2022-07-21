@@ -191,7 +191,13 @@ $ ./uninstall.sh
    - ingressgateway
      - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]`로 설정 , default:info
 
+4. bookinfo.yaml (Workload)
 
+   - istio-proxy Container
+
+     - istio-sidecar-injector Configmap에 proxy.loglevel= [info/warning/error/debug]로 설정, default: warning
+
+       
 
 
 
