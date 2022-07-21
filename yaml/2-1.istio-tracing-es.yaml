@@ -241,7 +241,7 @@ spec:
       serviceAccountName: jaeger-service-account
       containers:
       - name: gatekeeper
-        image: quay.io/keycloak/keycloak-gatekeeper:{GATEKEEPER_VERSION}
+        image: docker.io/tmaxcloudck/gatekeeper:{GATEKEEPER_VERSION}
         imagePullPolicy: Always
         args:
         - --client-id={CLIENT_ID}
