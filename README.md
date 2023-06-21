@@ -189,7 +189,9 @@
     ```
 
 ## 에러 대응
-# "MountVolume.SetUp failed for volume "istio-token" : failed to fetch token: the API server does not have TokenRequest endpoints enabled"
+### istiod 배포 시에 아래와 같은 오류 발생
+
+"MountVolume.SetUp failed for volume "istio-token" : failed to fetch token: the API server does not have TokenRequest endpoints enabled"
 ```text
 To authenticate with the Istio control plane, the Istio proxy will use a Service Account token. Kubernetes supports two forms of these tokens:
 
@@ -205,5 +207,5 @@ While most cloud providers support this feature now, many local development tool
     - --service-account-issuer=kubernetes.default.svc                 # 추가 (환경에 맞게 변경)
     - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key   # 추가 (환경에 맞게 변경)
 ```
-2. first-party-jwt 사용
+2. first-party-jwt 사용<br/>
 istiod의 juwPolicy를 first-party-jwt로 변경
