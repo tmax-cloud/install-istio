@@ -188,24 +188,3 @@
     $ ./root-transition.sh root-transition
     ```
 
-## 에러 대응
-### istiod 배포 시에 아래와 같은 오류 발생
-
-"MountVolume.SetUp failed for volume "istio-token" : failed to fetch token: the API server does not have TokenRequest endpoints enabled"
-```text
-To authenticate with the Istio control plane, the Istio proxy will use a Service Account token. Kubernetes supports two forms of these tokens:
-
-Third party tokens, which have a scoped audience and expiration.
-First party tokens, which have no expiration and are mounted into all pods.
-Because the properties of the first party token are less secure, Istio will default to using third party tokens. However, this feature is not enabled on all Kubernetes platforms.
-
-While most cloud providers support this feature now, many local development tools and custom installations may not.
-```
-대응 방법에는 두 가지가 있다.
-1. /etc/kubernetes/manifests/kube-apiserver.yaml 수정
-```bash
-    - --service-account-issuer=kubernetes.default.svc                 # 추가 (환경에 맞게 변경)
-    - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key   # 추가 (환경에 맞게 변경)
-```
-2. first-party-jwt 사용<br/>
-istiod의 juwPolicy를 first-party-jwt로 변경
