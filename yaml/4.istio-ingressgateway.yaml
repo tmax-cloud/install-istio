@@ -3,60 +3,59 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: istio-ingressgateway-sds
+  name: ingressgateway
   namespace: istio-system
   labels:
     release: istio
 rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
-
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: istio-ingressgateway-service-account
+  name: ingressgateway
   namespace: istio-system
   labels:
-    app: istio-ingressgateway
+    app: ingressgateway
     istio: ingressgateway
-
     release: istio
 ---
-
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: istio-ingressgateway-sds
+  name: ingressgateway
   namespace: istio-system
   labels:
     release: istio
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: istio-ingressgateway-sds
+  name: ingressgateway
 subjects:
 - kind: ServiceAccount
-  name: istio-ingressgateway-service-account
+  name: ingressgateway
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: istio-ingressgateway
+    app: ingressgateway
     istio: ingressgateway
     release: istio
-  name: istio-ingressgateway
+  name: ingressgateway
   namespace: istio-system
 spec:
   selector:
     matchLabels:
-      app: istio-ingressgateway
+      app: ingressgateway
       istio: ingressgateway
   strategy:
     rollingUpdate:
@@ -66,14 +65,18 @@ spec:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+        prometheus.io/port: "15020"
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/stats/prometheus"
+        inject.istio.io/templates: "gateway"
       labels:
-        app: istio-ingressgateway
-        chart: gateways
-        heritage: Tiller
+        app: ingressgateway
         istio: ingressgateway
         release: istio
-        service.istio.io/canonical-name: istio-ingressgateway
-        service.istio.io/canonical-revision: "1.5"
+        service.istio.io/canonical-name: ingressgateway
+        service.istio.io/canonical-revision: "1.15.4"
+        istio.io/rev: "default"
+        sidecar.istio.io/inject: "true"
     spec:
       affinity:
         nodeAffinity:
@@ -123,19 +126,16 @@ spec:
         - 1m0s
         - --connectTimeout
         - 10s
-        - --serviceCluster
-        - istio-ingressgateway
-        - --zipkinAddress
-        - zipkin.istio-system:9411
-        - --proxyAdminPort
-        - "15000"
+#        - --serviceCluster
+#        - istio-ingressgateway
+#        - --zipkinAddress
+#        - zipkin.istio-system:9411
+#        - --proxyAdminPort
+#        - "15000"
         - --statusPort
-        - "15020"
-        - --controlPlaneAuthPolicy
-        - NONE
-        - --discoveryAddress
-        - istio-pilot.istio-system.svc:15012
-        - --trust-domain=cluster.local
+        - "15021"
+#        - --controlPlaneAuthPolicy
+#        - NONE
         env:
         - name: JWT_POLICY
           value: first-party-jwt
@@ -144,7 +144,7 @@ spec:
         - name: ISTIO_META_USER_SDS
           value: "true"
         - name: CA_ADDR
-          value: istio-pilot.istio-system.svc:15012
+          value: istiod.istio-system.svc:15012
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -175,13 +175,11 @@ spec:
             fieldRef:
               fieldPath: spec.serviceAccountName
         - name: ISTIO_META_WORKLOAD_NAME
-          value: istio-ingressgateway
+          value: ingressgateway
         - name: ISTIO_META_OWNER
-          value: kubernetes://apis/apps/v1/namespaces/istio-system/deployments/istio-ingressgateway
+          value: kubernetes://apis/apps/v1/namespaces/istio-system/deployments/ingressgateway
         - name: ISTIO_META_MESH_ID
           value: cluster.local
-        - name: ISTIO_AUTO_MTLS_ENABLED
-          value: "true"
         - name: ISTIO_META_POD_NAME
           valueFrom:
             fieldRef:
@@ -191,15 +189,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: ISTIO_META_ROUTER_MODE
-          value: sni-dnat
         - name: ISTIO_META_CLUSTER_ID
           value: Kubernetes
+        - name: ISTIO_META_INTERCEPTION_MODE
+          value: REDIRECT
+        - name: TRUST_DOMAIN
+          value: cluster.local
         image: docker.io/istio/proxyv2:{ISTIO_VERSION}
         imagePullPolicy: IfNotPresent
         name: istio-proxy
         ports:
-        - containerPort: 15020
+        - containerPort: 15021
         - containerPort: 80
         - containerPort: 443
         - containerPort: 15029
@@ -215,11 +215,13 @@ spec:
         - containerPort: 15090
           name: http-envoy-prom
           protocol: TCP
+        - containerPort: 15000
+          name: proxyAdminPort
         readinessProbe:
           failureThreshold: 30
           httpGet:
             path: /healthz/ready
-            port: 15020
+            port: 15021
             scheme: HTTP
           initialDelaySeconds: 1
           periodSeconds: 2
@@ -232,47 +234,8 @@ spec:
           requests:
             cpu: 50m
             memory: 128Mi
-        volumeMounts:
-        - mountPath: /var/run/secrets/istio
-          name: istiod-ca-cert
-        - mountPath: /var/run/ingress_gateway
-          name: ingressgatewaysdsudspath
-        - mountPath: /etc/istio/pod
-          name: podinfo
-        - mountPath: /etc/istio/ingressgateway-certs
-          name: ingressgateway-certs
-          readOnly: true
-        - mountPath: /etc/istio/ingressgateway-ca-certs
-          name: ingressgateway-ca-certs
-          readOnly: true
-      serviceAccountName: istio-ingressgateway-service-account
-      volumes:
-      - configMap:
-          name: istio-ca-root-cert
-        name: istiod-ca-cert
-      - downwardAPI:
-          items:
-          - fieldRef:
-              fieldPath: metadata.labels
-            path: labels
-          - fieldRef:
-              fieldPath: metadata.annotations
-            path: annotations
-        name: podinfo
-      - emptyDir: {}
-        name: ingressgatewaysdsudspath
-      - name: ingressgateway-certs
-        secret:
-          optional: true
-          secretName: istio-ingressgateway-certs
-      - name: ingressgateway-ca-certs
-        secret:
-          optional: true
-          secretName: istio-ingressgateway-ca-certs
-
+      serviceAccountName: ingressgateway
 ---
-
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -286,8 +249,14 @@ metadata:
 spec:
   ports:
   - name: status-port
-    port: 15020
-    targetPort: 15020
+    port: 15021
+    targetPort: 15021
+  - name: tls-istiod
+    port: 15443
+    targetPort: 15443
+  - name: tls-webhook
+    port: 15017
+    targetPort: 15017
   - name: http2
     port: 80
     targetPort: 80
@@ -310,19 +279,19 @@ spec:
     targetPort: 15443
   - name: tcp
     port: 31400
+  - name: proxyAdminPort
+    port: 15000
+    targetPort: 15000
   selector:
     app: istio-ingressgateway
     istio: ingressgateway
   type: LoadBalancer
-
 ---
-
-
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   labels:
-    app: istio-ingressgateway
+    app: ingressgateway
     istio: ingressgateway
     release: istio
   name: istio-ingressgateway
@@ -338,11 +307,8 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: istio-ingressgateway
-
+    name: ingressgateway
 ---
-
-
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -362,15 +328,13 @@ spec:
       - "*"
     # Additional ports in gateaway for the ingressPorts - apps using dedicated port instead of hostname
 ---
-
-
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: ingressgateway
   namespace: istio-system
   labels:
-    app: istio-ingressgateway
+    app: ingressgateway
     istio: ingressgateway
 
     release: istio
@@ -378,8 +342,7 @@ spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: istio-ingressgateway
+      app: ingressgateway
       istio: ingressgateway
-
       release: istio
 ---
