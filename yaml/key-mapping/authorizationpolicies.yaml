@@ -1,197 +1,205 @@
----
-apiVersion: "apiextensions.k8s.io/v1beta1"
-kind: "CustomResourceDefinition"
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
 metadata:
   annotations:
-    helm.sh/resource-policy: "keep"
+    "helm.sh/resource-policy": keep
   labels:
-    app: "istio-pilot"
-    chart: "istio"
-    heritage: "Tiller"
-    istio: "security"
-    release: "istio"
-  name: "authorizationpolicies.security.istio.io"
+    app: istio-pilot
+    chart: istio
+    heritage: Tiller
+    istio: security
+    release: istio
+  name: authorizationpolicies.security.istio.io
 spec:
-  group: "security.istio.io"
+  group: security.istio.io
   names:
     categories:
-    - "istio-io"
-    - "security-istio-io"
-    kind: "AuthorizationPolicy"
-    listKind: "AuthorizationPolicyList"
-    plural: "authorizationpolicies"
-    singular: "authorizationpolicy"
-  scope: "Namespaced"
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec"
-          properties:
-            action:
-              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.action"
-              enum:
-              - "ALLOW"
-              - "DENY"
-              type: "string"
-            rules:
-              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules"
-              items:
-                properties:
-                  from:
-                    description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from"
-                    items:
-                      properties:
-                        source:
-                          description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source"
-                          properties:
-                            ipBlocks:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.ipBlocks"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            namespaces:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.namespaces"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notIpBlocks:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notIpBlocks"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notNamespaces:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notNamespaces"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notPrincipals:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notPrincipals"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notRequestPrincipals:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notRequestPrincipals"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            principals:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.principals"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            requestPrincipals:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.requestPrincipals"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                          type: "object"
-                      type: "object"
-                    type: "array"
-                  to:
-                    description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to"
-                    items:
-                      properties:
-                        operation:
-                          description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation"
-                          properties:
-                            hosts:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.hosts"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            methods:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.methods"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notHosts:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notHosts"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notMethods:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notMethods"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notPaths:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notPaths"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            notPorts:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notPorts"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            paths:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.paths"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                            ports:
-                              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.ports"
-                              items:
-                                format: "string"
-                                type: "string"
-                              type: "array"
-                          type: "object"
-                      type: "object"
-                    type: "array"
-                  when:
-                    description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.when"
-                    items:
-                      properties:
-                        key:
-                          description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.when.items.properties.key"
-                          format: "string"
-                          type: "string"
-                        notValues:
-                          description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.when.items.properties.notValues"
-                          items:
-                            format: "string"
-                            type: "string"
-                          type: "array"
-                        values:
-                          description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.rules.items.properties.when.items.properties.values"
-                          items:
-                            format: "string"
-                            type: "string"
-                          type: "array"
-                      type: "object"
-                    type: "array"
-                type: "object"
-              type: "array"
-            selector:
-              description: "%authorizationpolicies.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.selector"
-              properties:
-                matchLabels:
-                  additionalProperties:
-                    format: "string"
-                    type: "string"
-                  type: "object"
-              type: "object"
-          type: "object"
-      type: "object"
+      - istio-io
+      - security-istio-io
+    kind: AuthorizationPolicy
+    listKind: AuthorizationPolicyList
+    plural: authorizationpolicies
+    singular: authorizationpolicy
+  scope: Namespaced
   versions:
-  - name: "v1beta1"
-    served: true
-    storage: true
+    - name: v1beta1
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec"
+              oneOf:
+                - not:
+                    anyOf:
+                      - required:
+                          - provider
+                - required:
+                    - provider
+              properties:
+                action:
+                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.action"
+                  enum:
+                    - ALLOW
+                    - DENY
+                    - AUDIT
+                    - CUSTOM
+                  type: string
+                provider:
+                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.provider"
+                  properties:
+                    name:
+                      description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.provider.properties.name"
+                      type: string
+                  type: object
+                rules:
+                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules"
+                  items:
+                    properties:
+                      from:
+                        description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from"
+                        items:
+                          properties:
+                            source:
+                              description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source"
+                              properties:
+                                ipBlocks:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.ipBlocks"
+                                  items:
+                                    type: string
+                                  type: array
+                                namespaces:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.namespaces"
+                                  items:
+                                    type: string
+                                  type: array
+                                notIpBlocks:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notIpBlocks"
+                                  items:
+                                    type: string
+                                  type: array
+                                notNamespaces:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notNamespaces"
+                                  items:
+                                    type: string
+                                  type: array
+                                notPrincipals:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notPrincipals"
+                                  items:
+                                    type: string
+                                  type: array
+                                notRemoteIpBlocks:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notRemoteIpBlocks"
+                                  items:
+                                    type: string
+                                  type: array
+                                notRequestPrincipals:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.notRequestPrincipals"
+                                  items:
+                                    type: string
+                                  type: array
+                                principals:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.principals"
+                                  items:
+                                    type: string
+                                  type: array
+                                remoteIpBlocks:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.remoteIpBlocks"
+                                  items:
+                                    type: string
+                                  type: array
+                                requestPrincipals:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.from.items.properties.source.properties.requestPrincipals"
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                          type: object
+                        type: array
+                      to:
+                        description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to"
+                        items:
+                          properties:
+                            operation:
+                              description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation"
+                              properties:
+                                hosts:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.hosts"
+                                  items:
+                                    type: string
+                                  type: array
+                                methods:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.methods"
+                                  items:
+                                    type: string
+                                  type: array
+                                notHosts:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notHosts"
+                                  items:
+                                    type: string
+                                  type: array
+                                notMethods:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notMethods"
+                                  items:
+                                    type: string
+                                  type: array
+                                notPaths:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notPaths"
+                                  items:
+                                    type: string
+                                  type: array
+                                notPorts:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.notPorts"
+                                  items:
+                                    type: string
+                                  type: array
+                                paths:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.paths"
+                                  items:
+                                    type: string
+                                  type: array
+                                ports:
+                                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.to.items.properties.operation.properties.ports"
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                          type: object
+                        type: array
+                      when:
+                        description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.when"
+                        items:
+                          properties:
+                            key:
+                              description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.when.items.properties.key"
+                              type: string
+                            notValues:
+                              description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.when.items.properties.notValues"
+                              items:
+                                type: string
+                              type: array
+                            values:
+                              description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.rules.items.properties.when.items.properties.values"
+                              items:
+                                type: string
+                              type: array
+                          type: object
+                        type: array
+                    type: object
+                  type: array
+                selector:
+                  description: "%authorizationpolicies.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.selector"
+                  properties:
+                    matchLabels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  type: object
+              type: object
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
