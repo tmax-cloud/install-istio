@@ -216,7 +216,7 @@ spec:
           name: http-envoy-prom
           protocol: TCP
         - containerPort: 15000
-          name: proxyAdminPort
+          name: proxy-admin-port
         readinessProbe:
           failureThreshold: 30
           httpGet:
@@ -279,7 +279,7 @@ spec:
     targetPort: 15443
   - name: tcp
     port: 31400
-  - name: proxyAdminPort
+  - name: proxy-admin-port
     port: 15000
     targetPort: 15000
   selector:
@@ -301,7 +301,9 @@ spec:
   metrics:
   - resource:
       name: cpu
-      targetAverageUtilization: 80
+      target:
+        averageUtilization: 80
+        type: Utilization
     type: Resource
   minReplicas: 1
   scaleTargetRef:
@@ -327,22 +329,3 @@ spec:
     hosts:
       - "*"
     # Additional ports in gateaway for the ingressPorts - apps using dedicated port instead of hostname
----
-apiVersion: policy/v1beta1
-kind: PodDisruptionBudget
-metadata:
-  name: ingressgateway
-  namespace: istio-system
-  labels:
-    app: ingressgateway
-    istio: ingressgateway
-
-    release: istio
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: ingressgateway
-      istio: ingressgateway
-      release: istio
----

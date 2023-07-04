@@ -142,7 +142,7 @@ spec:
           env:
             - name: SPAN_STORAGE_TYPE
               value: grpc-plugin
-      initContainer:
+      initContainers:
         - image: docker.io/tmaxcloudck/jaeger-loki-plugin:{PLUGIN_VERSION}
           name: install-plugin
           imagePullPolicy: IfNotPresent
