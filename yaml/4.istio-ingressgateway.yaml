@@ -78,9 +78,6 @@ spec:
         - image: auto
           imagePullPolicy: IfNotPresent
           name: istio-proxy
-          env:
-            - name: JWT_POLICY
-              value: first-party-jwt
           ports:
           - containerPort: 15021
           - containerPort: 80
