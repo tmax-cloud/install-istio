@@ -1,285 +1,227 @@
----
-apiVersion: "apiextensions.k8s.io/v1beta1"
-kind: "CustomResourceDefinition"
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
 metadata:
   annotations:
-    helm.sh/resource-policy: "keep"
+    "helm.sh/resource-policy": keep
   labels:
-    app: "istio-pilot"
-    chart: "istio"
-    heritage: "Tiller"
-    release: "istio"
-  name: "envoyfilters.networking.istio.io"
+    app: istio-pilot
+    chart: istio
+    heritage: Tiller
+    release: istio
+  name: envoyfilters.networking.istio.io
 spec:
-  group: "networking.istio.io"
+  group: networking.istio.io
   names:
     categories:
-    - "istio-io"
-    - "networking-istio-io"
-    kind: "EnvoyFilter"
-    listKind: "EnvoyFilterList"
-    plural: "envoyfilters"
-    singular: "envoyfilter"
-  scope: "Namespaced"
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec"
+      - istio-io
+      - networking-istio-io
+    kind: EnvoyFilter
+    listKind: EnvoyFilterList
+    plural: envoyfilters
+    singular: envoyfilter
+  scope: Namespaced
+  versions:
+    - name: v1alpha3
+      schema:
+        openAPIV3Schema:
           properties:
-            configPatches:
-              description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches"
-              items:
-                properties:
-                  applyTo:
-                    enum:
-                    - "INVALID"
-                    - "LISTENER"
-                    - "FILTER_CHAIN"
-                    - "NETWORK_FILTER"
-                    - "HTTP_FILTER"
-                    - "ROUTE_CONFIGURATION"
-                    - "VIRTUAL_HOST"
-                    - "HTTP_ROUTE"
-                    - "CLUSTER"
-                    type: "string"
-                  match:
-                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match"
-                    oneOf:
-                    - required:
-                      - "listener"
-                    - required:
-                      - "routeConfiguration"
-                    - required:
-                      - "cluster"
+            spec:
+              description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec"
+              properties:
+                configPatches:
+                  description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches"
+                  items:
                     properties:
-                      cluster:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster"
-                        properties:
-                          name:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.name"
-                            format: "string"
-                            type: "string"
-                          portNumber:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.portNumber"
-                            type: "integer"
-                          service:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.service"
-                            format: "string"
-                            type: "string"
-                          subset:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.subset"
-                            format: "string"
-                            type: "string"
-                        type: "object"
-                      context:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.context"
+                      applyTo:
                         enum:
-                        - "ANY"
-                        - "SIDECAR_INBOUND"
-                        - "SIDECAR_OUTBOUND"
-                        - "GATEWAY"
-                        type: "string"
-                      listener:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener"
+                          - INVALID
+                          - LISTENER
+                          - FILTER_CHAIN
+                          - NETWORK_FILTER
+                          - HTTP_FILTER
+                          - ROUTE_CONFIGURATION
+                          - VIRTUAL_HOST
+                          - HTTP_ROUTE
+                          - CLUSTER
+                          - EXTENSION_CONFIG
+                          - BOOTSTRAP
+                        type: string
+                      match:
+                        description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match"
+                        oneOf:
+                          - not:
+                              anyOf:
+                                - required:
+                                    - listener
+                                - required:
+                                    - routeConfiguration
+                                - required:
+                                    - cluster
+                          - required:
+                              - listener
+                          - required:
+                              - routeConfiguration
+                          - required:
+                              - cluster
                         properties:
-                          filterChain:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain"
+                          cluster:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster"
                             properties:
-                              applicationProtocols:
-                                description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.applicationProtocols"
-                                format: "string"
-                                type: "string"
-                              filter:
-                                description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.filter"
+                              name:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.name"
+                                type: string
+                              portNumber:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.portNumber"
+                                type: integer
+                              service:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.service"
+                                type: string
+                              subset:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.cluster.properties.subset"
+                                type: string
+                            type: object
+                          context:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.context"
+                            enum:
+                              - ANY
+                              - SIDECAR_INBOUND
+                              - SIDECAR_OUTBOUND
+                              - GATEWAY
+                            type: string
+                          listener:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener"
+                            properties:
+                              filterChain:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain"
                                 properties:
-                                  name:
-                                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.filter.properties.name"
-                                    format: "string"
-                                    type: "string"
-                                  subFilter:
+                                  applicationProtocols:
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.applicationProtocols"
+                                    type: string
+                                  destinationPort:
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.destinationPort"
+                                    type: integer
+                                  filter:
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.filter"
                                     properties:
                                       name:
-                                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.filter.properties.subFilter.properties.name"
-                                        format: "string"
-                                        type: "string"
-                                    type: "object"
-                                type: "object"
-                              name:
-                                description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.name"
-                                format: "string"
-                                type: "string"
-                              sni:
-                                description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.sni"
-                                format: "string"
-                                type: "string"
-                              transportProtocol:
-                                description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.transportProtocol"
-                                format: "string"
-                                type: "string"
-                            type: "object"
-                          name:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.name"
-                            format: "string"
-                            type: "string"
-                          portName:
-                            format: "string"
-                            type: "string"
-                          portNumber:
-                            type: "integer"
-                        type: "object"
-                      proxy:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.proxy"
-                        properties:
-                          metadata:
-                            additionalProperties:
-                              format: "string"
-                              type: "string"
-                            type: "object"
-                          proxyVersion:
-                            format: "string"
-                            type: "string"
-                        type: "object"
-                      routeConfiguration:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration"
-                        properties:
-                          gateway:
-                            format: "string"
-                            type: "string"
-                          name:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.name"
-                            format: "string"
-                            type: "string"
-                          portName:
-                            description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.portName"
-                            format: "string"
-                            type: "string"
-                          portNumber:
-                            type: "integer"
-                          vhost:
-                            properties:
-                              name:
-                                format: "string"
-                                type: "string"
-                              route:
-                                description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.vhost.properties.route"
-                                properties:
-                                  action:
-                                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.vhost.properties.route.properties.action"
-                                    enum:
-                                    - "ANY"
-                                    - "ROUTE"
-                                    - "REDIRECT"
-                                    - "DIRECT_RESPONSE"
-                                    type: "string"
+                                        description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.filter.properties.name"
+                                        type: string
+                                      subFilter:
+                                        properties:
+                                          name:
+                                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.filter.properties.subFilter.properties.name"
+                                            type: string
+                                        type: object
+                                    type: object
                                   name:
-                                    format: "string"
-                                    type: "string"
-                                type: "object"
-                            type: "object"
-                        type: "object"
-                    type: "object"
-                  patch:
-                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch"
-                    properties:
-                      operation:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch.properties.operation"
-                        enum:
-                        - "INVALID"
-                        - "MERGE"
-                        - "ADD"
-                        - "REMOVE"
-                        - "INSERT_BEFORE"
-                        - "INSERT_AFTER"
-                        - "INSERT_FIRST"
-                        type: "string"
-                      value:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch.properties.value"
-                        type: "object"
-                    type: "object"
-                type: "object"
-              type: "array"
-            filters:
-              items:
-                properties:
-                  filterConfig:
-                    type: "object"
-                  filterName:
-                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.filterName"
-                    format: "string"
-                    type: "string"
-                  filterType:
-                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.filterType"
-                    enum:
-                    - "INVALID"
-                    - "HTTP"
-                    - "NETWORK"
-                    type: "string"
-                  insertPosition:
-                    description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.insertPosition"
-                    properties:
-                      index:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.insertPosition.properties.index"
-                        enum:
-                        - "FIRST"
-                        - "LAST"
-                        - "BEFORE"
-                        - "AFTER"
-                        type: "string"
-                      relativeTo:
-                        format: "string"
-                        type: "string"
-                    type: "object"
-                  listenerMatch:
-                    properties:
-                      address:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.listenerMatch.properties.address"
-                        items:
-                          format: "string"
-                          type: "string"
-                        type: "array"
-                      listenerProtocol:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.listenerMatch.properties.listenerProtocol"
-                        enum:
-                        - "ALL"
-                        - "HTTP"
-                        - "TCP"
-                        type: "string"
-                      listenerType:
-                        description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.filters.items.properties.listenerMatch.properties.listenerType"
-                        enum:
-                        - "ANY"
-                        - "SIDECAR_INBOUND"
-                        - "SIDECAR_OUTBOUND"
-                        - "GATEWAY"
-                        type: "string"
-                      portNamePrefix:
-                        format: "string"
-                        type: "string"
-                      portNumber:
-                        type: "integer"
-                    type: "object"
-                type: "object"
-              type: "array"
-            workloadLabels:
-              additionalProperties:
-                format: "string"
-                type: "string"
-              description: "%envoyfilters.yaml.spec.validation.openAPIV3Schema.properties.spec.properties.workloadLabels"
-              type: "object"
-            workloadSelector:
-              properties:
-                labels:
-                  additionalProperties:
-                    format: "string"
-                    type: "string"
-                  type: "object"
-              type: "object"
-          type: "object"
-      type: "object"
-  versions:
-  - name: "v1alpha3"
-    served: true
-    storage: true
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.name"
+                                    type: string
+                                  sni:
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.sni"
+                                    type: string
+                                  transportProtocol:
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.filterChain.properties.transportProtocol"
+                                    type: string
+                                type: object
+                              name:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.listener.properties.name"
+                                type: string
+                              portName:
+                                type: string
+                              portNumber:
+                                type: integer
+                            type: object
+                          proxy:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.proxy"
+                            properties:
+                              metadata:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              proxyVersion:
+                                type: string
+                            type: object
+                          routeConfiguration:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration"
+                            properties:
+                              gateway:
+                                type: string
+                              name:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.name"
+                                type: string
+                              portName:
+                                description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.portName"
+                                type: string
+                              portNumber:
+                                type: integer
+                              vhost:
+                                properties:
+                                  name:
+                                    type: string
+                                  route:
+                                    description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.vhost.properties.route"
+                                    properties:
+                                      action:
+                                        description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.match.properties.routeConfiguration.properties.vhost.properties.route.properties.action"
+                                        enum:
+                                          - ANY
+                                          - ROUTE
+                                          - REDIRECT
+                                          - DIRECT_RESPONSE
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                        type: object
+                      patch:
+                        description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch"
+                        properties:
+                          filterClass:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch.properties.filterClass"
+                            enum:
+                              - UNSPECIFIED
+                              - AUTHN
+                              - AUTHZ
+                              - STATS
+                            type: string
+                          operation:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch.properties.operation"
+                            enum:
+                              - INVALID
+                              - MERGE
+                              - ADD
+                              - REMOVE
+                              - INSERT_BEFORE
+                              - INSERT_AFTER
+                              - INSERT_FIRST
+                              - REPLACE
+                            type: string
+                          value:
+                            description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.configPatches.items.properties.patch.properties.value"
+                            type: object
+                            x-kubernetes-preserve-unknown-fields: true
+                        type: object
+                    type: object
+                  type: array
+                priority:
+                  description: "%envoyfilters.yaml.spec.versions.schema.openAPIV3Schema.properties.spec.properties.priority"
+                  format: int32
+                  type: integer
+                workloadSelector:
+                  properties:
+                    labels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  type: object
+              type: object
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
