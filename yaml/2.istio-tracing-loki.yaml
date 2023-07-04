@@ -269,7 +269,7 @@ spec:
             - --forbidden-page=/html/access-forbidden.html
             - --resources=uri=/*|roles=jaeger:jaeger-manager
             - --enable-encrypted-token
-            - --log-level=error
+            - --log-level=info
           ports:
             - containerPort: 3000
               name: gatekeeper

@@ -64,7 +64,7 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: "true"
         prometheus.io/port: "15020"
         prometheus.io/scrape: "true"
         prometheus.io/path: "/stats/prometheus"
@@ -72,168 +72,62 @@ spec:
       labels:
         app: ingressgateway
         istio: ingressgateway
-        release: istio
-        service.istio.io/canonical-name: ingressgateway
-        service.istio.io/canonical-revision: "1.15.4"
-        istio.io/rev: "default"
         sidecar.istio.io/inject: "true"
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
-              matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - amd64
-            weight: 2
-          - preference:
-              matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - ppc64le
-            weight: 2
-          - preference:
-              matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - s390x
-            weight: 2
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: beta.kubernetes.io/arch
-                operator: In
-                values:
-                - amd64
-                - ppc64le
-                - s390x
       containers:
-      - args:
-        - proxy
-        - router
-        - --domain
-        - $(POD_NAMESPACE).svc.cluster.local
-        - --proxyLogLevel=warning
-        - --proxyComponentLogLevel=misc:error
-        - --log_output_level=default:info
-        - --drainDuration
-        - 45s
-        - --parentShutdownDuration
-        - 1m0s
-        - --connectTimeout
-        - 10s
-#        - --serviceCluster
-#        - istio-ingressgateway
-#        - --zipkinAddress
-#        - zipkin.istio-system:9411
-#        - --proxyAdminPort
-#        - "15000"
-        - --statusPort
-        - "15021"
-#        - --controlPlaneAuthPolicy
-#        - NONE
-        env:
-        - name: JWT_POLICY
-          value: first-party-jwt
-        - name: PILOT_CERT_PROVIDER
-          value: istiod
-        - name: ISTIO_META_USER_SDS
-          value: "true"
-        - name: CA_ADDR
-          value: istiod.istio-system.svc:15012
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: spec.nodeName
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        - name: INSTANCE_IP
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.podIP
-        - name: HOST_IP
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.hostIP
-        - name: SERVICE_ACCOUNT
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.serviceAccountName
-        - name: ISTIO_META_WORKLOAD_NAME
-          value: ingressgateway
-        - name: ISTIO_META_OWNER
-          value: kubernetes://apis/apps/v1/namespaces/istio-system/deployments/ingressgateway
-        - name: ISTIO_META_MESH_ID
-          value: cluster.local
-        - name: ISTIO_META_POD_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-        - name: ISTIO_META_CONFIG_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: ISTIO_META_CLUSTER_ID
-          value: Kubernetes
-        - name: ISTIO_META_INTERCEPTION_MODE
-          value: REDIRECT
-        - name: TRUST_DOMAIN
-          value: cluster.local
-        image: docker.io/istio/proxyv2:{ISTIO_VERSION}
-        imagePullPolicy: IfNotPresent
-        name: istio-proxy
-        ports:
-        - containerPort: 15021
-        - containerPort: 80
-        - containerPort: 443
-        - containerPort: 15029
-        - containerPort: 15030
-        - containerPort: 15031
-        - containerPort: 15032
-        - containerPort: 15443
-        - containerPort: 31400
-        - containerPort: 15011
-        - containerPort: 15012
-        - containerPort: 8060
-        - containerPort: 853
-        - containerPort: 15090
-          name: http-envoy-prom
-          protocol: TCP
-        - containerPort: 15000
-          name: proxy-admin
-        readinessProbe:
-          failureThreshold: 30
-          httpGet:
-            path: /healthz/ready
-            port: 15021
-            scheme: HTTP
-          initialDelaySeconds: 1
-          periodSeconds: 2
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources:
-          limits:
-            cpu: 200m
-            memory: 512Mi
-          requests:
-            cpu: 50m
-            memory: 128Mi
+        - image: auto
+          imagePullPolicy: IfNotPresent
+          name: istio-proxy
+          ports:
+          - containerPort: 15021
+          - containerPort: 80
+          - containerPort: 443
+          - containerPort: 15029
+          - containerPort: 15030
+          - containerPort: 15031
+          - containerPort: 15032
+          - containerPort: 15443
+          - containerPort: 31400
+          - containerPort: 15011
+          - containerPort: 15012
+          - containerPort: 8060
+          - containerPort: 853
+          - containerPort: 15090
+            name: http-envoy-prom
+            protocol: TCP
+          - containerPort: 15000
+            name: proxy-admin
+          readinessProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz/ready
+              port: 15021
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsUser: 1337
+            runAsGroup: 1337
+            runAsNonRoot: true
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: '0'
       serviceAccountName: ingressgateway
 ---
 apiVersion: v1
@@ -274,9 +168,6 @@ spec:
   - name: tracing
     port: 15032
     targetPort: 15032
-  - name: tls
-    port: 15443
-    targetPort: 15443
   - name: tcp
     port: 31400
   - name: proxy-admin
@@ -294,7 +185,7 @@ metadata:
     app: ingressgateway
     istio: ingressgateway
     release: istio
-  name: istio-ingressgateway
+  name: ingressgateway
   namespace: istio-system
 spec:
   maxReplicas: 1
