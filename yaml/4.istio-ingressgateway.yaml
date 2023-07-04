@@ -216,7 +216,7 @@ spec:
           name: http-envoy-prom
           protocol: TCP
         - containerPort: 15000
-          name: proxy-admin-port
+          name: proxy-admin
         readinessProbe:
           failureThreshold: 30
           httpGet:
@@ -241,10 +241,10 @@ kind: Service
 metadata:
   annotations: null
   labels:
-    app: istio-ingressgateway
+    app: ingressgateway
     istio: ingressgateway
     release: istio
-  name: istio-ingressgateway
+  name: ingressgateway
   namespace: istio-system
 spec:
   ports:
@@ -279,11 +279,11 @@ spec:
     targetPort: 15443
   - name: tcp
     port: 31400
-  - name: proxy-admin-port
+  - name: proxy-admin
     port: 15000
     targetPort: 15000
   selector:
-    app: istio-ingressgateway
+    app: ingressgateway
     istio: ingressgateway
   type: LoadBalancer
 ---
