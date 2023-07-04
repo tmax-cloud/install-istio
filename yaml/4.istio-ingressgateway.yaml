@@ -64,7 +64,7 @@ spec:
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: "true"
         prometheus.io/port: "15020"
         prometheus.io/scrape: "true"
         prometheus.io/path: "/stats/prometheus"
@@ -72,10 +72,6 @@ spec:
       labels:
         app: ingressgateway
         istio: ingressgateway
-        release: istio
-        service.istio.io/canonical-name: ingressgateway
-        service.istio.io/canonical-revision: "1.15.4"
-        istio.io/rev: "default"
         sidecar.istio.io/inject: "true"
     spec:
       affinity:
@@ -274,9 +270,6 @@ spec:
   - name: tracing
     port: 15032
     targetPort: 15032
-  - name: tls
-    port: 15443
-    targetPort: 15443
   - name: tcp
     port: 31400
   - name: proxy-admin
@@ -294,7 +287,7 @@ metadata:
     app: ingressgateway
     istio: ingressgateway
     release: istio
-  name: istio-ingressgateway
+  name: ingressgateway
   namespace: istio-system
 spec:
   maxReplicas: 1

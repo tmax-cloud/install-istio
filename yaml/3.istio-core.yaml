@@ -100,6 +100,9 @@ rules:
   - apiGroups: ["extensions", "networking.k8s.io"]
     resources: ["ingresses/status"]
     verbs: ["*"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingressclasses"]
+    verbs: ["get", "list", "watch"]
 
   # required for CA's namespace controller
   - apiGroups: [""]
@@ -1850,6 +1853,8 @@ spec:
             cpu: 500m
             memory: 1Gi
         securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           capabilities:
             drop:
             - ALL
