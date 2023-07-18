@@ -8,13 +8,13 @@
 
 ## 구성 요소 및 버전
 
-* istiod ([docker.io/istio/pilot:1.5.1](https://hub.docker.com/layers/istio/pilot/1.5.1/images/sha256-818aecc1c73c53af9091ac1d4f500d9d7cec6d135d372d03cffab1addaff4ec0?context=explore))
-* istio-ingressgateway ([docker.io/istio/proxyv2:1.5.1](https://hub.docker.com/layers/istio/proxyv2/1.5.1/images/sha256-3ad9ee2b43b299e5e6d97aaea5ed47dbf3da9293733607d9b52f358313e852ae?context=explore))
-* jaeger-agent[(docker.io/jaegertracing/jaeger-agent:1.27)](https://hub.docker.com/layers/jaeger-agent/jaegertracing/jaeger-agent/1.27/images/sha256-6f615305dc10d76ea6823ba55a0061112da6d08b31c863cedce2e1ac19528a2c?context=explore)
-* jaeger-query[(docker.io/jaegertracing/jaeger-query:1.27)](https://hub.docker.com/layers/jaeger-query/jaegertracing/jaeger-query/1.27/images/sha256-01a8eadb5cebb7e1db3db697148a987a666a69c3cce936686fcf3f0b979fe47e?context=explore)
+* istiod ([docker.io/istio/pilot:1.15.4](https://hub.docker.com/layers/istio/pilot/1.15.4/images/sha256-0416a54dcbd44ca676487a514457e74837774ca2a01a65dc77dca8dbcd2bab6c?context=explore))
+* istio-ingressgateway, sidecar ([docker.io/istio/proxyv2:1.15.4](https://hub.docker.com/layers/istio/proxyv2/1.15.4/images/sha256-978f9a028f210d35683b5c1c800798f05aeee3430cce0ef49d71d533aededafd?context=explore))
+* jaeger-agent[(docker.io/jaegertracing/jaeger-agent:1.35)](https://hub.docker.com/layers/jaegertracing/jaeger-agent/1.35/images/sha256-c835e623c16286289963c98362a331c6f79790f6eff032f286652fed5b6b26f9?context=explore)
+* jaeger-query[(docker.io/jaegertracing/jaeger-query:1.35)](https://hub.docker.com/layers/jaegertracing/jaeger-query/1.35/images/sha256-52e4f036045650a08b93e8f22e73fad2ecce558bc8675199e5917c0f87beee97?context=explore)
     * gatekeeper([docker.io/tmaxcloudck/gatekeeper:v1.0.2](https://hub.docker.com/layers/gatekeeper/tmaxcloudck/gatekeeper/v1.0.2/images/sha256-a9152f8e4ef0de9a27ce8471a6f7d46f86d42ae238cbd7e568ea7b480dbd200a?context=explore))
-
-* jaeger-collector[(docker.io/jaegertracing/jaeger-collector:1.27)](https://hub.docker.com/layers/jaeger-collector/jaegertracing/jaeger-collector/1.27/images/sha256-8d18ad8b616b843e79cf484a4c9307c8a62347ade531ca29ad1bad9055fa1e07?context=explore)
+* jaeger-loki-plugin (for grpc-plugin) ([docker.io/tmaxcloudck/jaeger-loki-plugin:v2.0.2](https://hub.docker.com/layers/tmaxcloudck/jaeger-loki-plugin/v2.0.2/images/sha256-fa9d2d566af611650ef305b678d15ad8bc37f5075c7d6644c517f1a0f8729da7?context=explore))
+* jaeger-collector([docker.io/jaegertracing/jaeger-collector:1.35](https://hub.docker.com/layers/jaegertracing/jaeger-collector/1.35/images/sha256-c19c2b6d30f37b8fd9b934575cabe73ad98bd1233f79a6438412605983ed899b?context=explore))
 * bookinfo example
     * productpage([docker.io/istio/examples-bookinfo-productpage-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-productpage-v1/1.15.0/images/sha256-0a5eb4795952372251d51f72834bccb7ea01a67cb72fd9b58b757cca103b7524?context=explore))
     * details([docker.io/istio/examples-bookinfo-details-v1:1.15.0](https://hub.docker.com/layers/istio/examples-bookinfo-details-v1/1.15.0/images/sha256-fce0bcbff0bed09116dacffca15695cd345e0c3788c15b0114a05f654ddecc17?context=explore))
@@ -25,7 +25,8 @@
 
 ## Prerequisites
 
-- EFK (elasticsearch) / Opensearch Stack (Opensearch)
+- loki (grpc-plugin) / EFK (elasticsearch) / Opensearch Stack (Opensearch)
+  <br/> install-istio 5.2부터는 jaeger의 log aggregation system으로 loki를 사용하는 것을 권장함.
 - HyperAuth 
 
 ## 폐쇄망 설치 가이드
@@ -37,13 +38,13 @@
 2. install yaml을 다운로드한다.
    
     ```bash
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/1.istio-base.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/2-1.istio-tracing-es.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/2-2.istio-tracing-os.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/3.istio-core.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/4.istio-ingressgateway.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/5.istio-metric.yaml
-    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.0/yaml/bookinfo.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/1.istio-base.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/2-1.istio-tracing-es.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/2-2.istio-tracing-os.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/3.istio-core.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/4.istio-ingressgateway.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/5.istio-metric.yaml
+    $ wget https://raw.githubusercontent.com/tmax-cloud/install-istio/5.2/yaml/bookinfo.yaml
     ```
 
 ## Install Steps
@@ -54,7 +55,15 @@
 
   * 폐쇄망에서 설치를 진행하여 별도의 image registry를 사용하는 경우 registry 정보를 추가로 설정해준다. 
 
-    * elasticsearch
+      * grpc-plugin
+
+          ```bash
+          $ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2.istio-tracing-loki.yaml
+          $ sed -i 's/docker.io\/jaegertracing\/jager-query/'${REGISTRY}'\/jaegertracing\/jaeger-query/g' 2.istio-tracing-loki.yaml
+          $ sed -i 's/docker.io\/jaegertracing\/jaeger-collector/'${REGISTRY}'\/jaegertracing\/jaeger-collector/g' 2.istio-tracing-loki.yaml
+          ```
+
+      * elasticsearch
     
         ```bash
         $ sed -i 's/docker.io\/jaegertracing\/jaeger-agent/'${REGISTRY}'\/jaegertracing\/jager-agent/g' 2-1.istio-tracing-es.yaml
@@ -154,6 +163,18 @@ $ ./uninstall.sh
         $ kubectl label namespace $YOUR_NAMESPACE istio-injection=enabled
         $ kubectl apply -f bookinfo.yaml -n $YOUR_NAMESPACE
         ```
+        * 이후 bookinfo-gateway.yaml에서 istio-ingressgateway의 이름에 맞게 selector/istio를 설정한 후 bookinfo-gateway와 bookinfo virtualservice를 배포한다.
+        ```bash
+        $ kubectl apply -f bookinfo-gateway.yaml -n $YOUR_NAMESPACE
+        $ kubectl apply -f bookinfo-virtualservice.yaml -n $YOUR_NAMESPACE
+        ```
+        * curl로 bookinfo 예제를 istio-ingress를 통해 호출하여 요청이 잘 이루어지는지 확인한다.
+        ```bash
+        $ kubectl get svc -n istio-system
+        $ curl -H "Host: bookinfo.demo.test" http://YOUR_ISTIO_INGRESSGATEWAY_ADDR/productpage
+        ```
+        * jaeger-query의 service를 외부로 노출한 후 해당 주소로 접근하여 해당 trace_data를 jaeger로 볼 수 있는 지 확인한다.
+          (istio와 jaeger의 설정에 따라 여러 번 호출해야 sampling 될 수 있다.)
 
 ## 인증서 갱신 가이드
 
@@ -188,9 +209,10 @@ $ ./uninstall.sh
    - istiod
      - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]` 로 설정, default: info
    
-3. istio-ingressgateway.yaml
-   - ingressgateway
-     - Deployment의 args에 `--log-output-level=[none/error/warn/info/debug]`로 설정 , default:info
+3. istio-core.yaml
+   - ingressgateway 및 sidecar
+     - istio-sidecar-injector configMap의 values에 logging/level: `[trace|debug|info|warning|error|critical|off]`로 설정, default:info
+     - 이를 통해 istio-injection=enabled인 pod에 들어가는 sidecar에 대해서도 logging level이 설정된다.
 
 4. bookinfo.yaml (Workload)
 
